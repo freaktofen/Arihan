@@ -1,0 +1,2264 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>أريهان</title>
+<meta name="description" content="أريهان — لعبة قرارات تفاعلية. أنت الملك، وكل قرار يغير مصير المملكة.">
+<meta name="theme-color" content="#080604">
+<meta property="og:title" content="أريهان — مملكة القرار والمصير">
+<meta property="og:description" content="لعبة قرارات تفاعلية. أنت الملك، وكل قرار يغير مصير المملكة.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Scheherazade+New:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --gold: #d4a843;
+  --gold2: #f0c96a;
+  --gold3: #8b6914;
+  --dark: #080604;
+  --dark2: #110e07;
+  --dark3: #1c170a;
+  --parchment: #e8d5a3;
+  --blood: #7a1515;
+  --ink: #1a1408;
+  --text: #ddc99a;
+  --text2: #a08860;
+  --accent-blue: #2a4a6a;
+  --accent-green: #1a3a2a;
+  --accent-red: #3a1010;
+}
+
+/* ── SPLASH SCREEN ── */
+#splash {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  background: var(--dark);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+#splash.hidden {
+  opacity: 0;
+  transform: scale(1.04);
+  pointer-events: none;
+}
+
+.splash-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  animation: splashReveal 1s ease both;
+}
+
+@keyframes splashReveal {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* SVG-style CSS logo mark */
+.logo-mark {
+  position: relative;
+  width: 90px;
+  height: 90px;
+  margin-bottom: 16px;
+}
+
+.logo-mark-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid rgba(212,168,67,0.25);
+  animation: ringPulse 3s ease-in-out infinite;
+}
+
+.logo-mark-ring:nth-child(2) {
+  inset: 8px;
+  border-color: rgba(212,168,67,0.45);
+  animation-delay: 0.4s;
+}
+
+.logo-mark-ring:nth-child(3) {
+  inset: 18px;
+  border-color: rgba(212,168,67,0.7);
+  animation-delay: 0.8s;
+}
+
+@keyframes ringPulse {
+  0%,100% { transform: scale(1); opacity: 1; }
+  50%      { transform: scale(1.05); opacity: 0.6; }
+}
+
+.logo-mark-crown {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 38px;
+  filter: drop-shadow(0 0 16px rgba(212,168,67,0.8));
+}
+
+/* Wordmark */
+.logo-wordmark {
+  text-align: center;
+}
+
+.logo-title-ar {
+  font-family: 'Amiri', serif;
+  font-size: 52px;
+  font-weight: 700;
+  letter-spacing: 6px;
+  background: linear-gradient(180deg, var(--gold2) 0%, var(--gold) 50%, var(--gold3) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1;
+  text-shadow: none;
+  position: relative;
+}
+
+/* Decorative line under title */
+.logo-wordmark::after {
+  content: '';
+  display: block;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  margin-top: 6px;
+}
+
+.logo-tagline {
+  font-family: 'Scheherazade New', serif;
+  font-size: 12px;
+  letter-spacing: 5px;
+  color: var(--text2);
+  margin-top: 8px;
+  opacity: 0.7;
+}
+
+/* Loading bar */
+.splash-loader {
+  width: 140px;
+  height: 2px;
+  background: rgba(212,168,67,0.1);
+  border-radius: 2px;
+  overflow: hidden;
+  animation: splashReveal 1s ease 0.3s both;
+}
+
+.splash-loader-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--gold3), var(--gold2));
+  border-radius: 2px;
+  animation: loadFill 1.8s cubic-bezier(0.4,0,0.2,1) 0.2s both;
+}
+
+@keyframes loadFill {
+  from { width: 0%; }
+  to   { width: 100%; }
+}
+
+.splash-hint {
+  font-family: 'Scheherazade New', serif;
+  font-size: 12px;
+  color: var(--text2);
+  opacity: 0;
+  letter-spacing: 2px;
+  animation: splashReveal 0.6s ease 1.6s both;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none; }
+
+html, body { height: 100%; overflow: hidden; }
+
+body {
+  font-family: 'Scheherazade New', serif;
+  background: var(--dark);
+  color: var(--text);
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+}
+
+/* ── CANVAS PARTICLES ── */
+#bgCanvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ── APP SHELL ── */
+#app {
+  position: relative;
+  z-index: 1;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+/* ── SCREENS ── */
+.screen {
+  display: none;
+  flex-direction: column;
+  height: 100%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.screen.active { display: flex; }
+
+/* =====================
+   INTRO SCREEN
+   ===================== */
+#intro {
+  justify-content: flex-start;
+  align-items: center;
+  padding: 0;
+  background: transparent;
+  overflow: hidden;
+}
+
+.intro-header {
+  width: 100%;
+  height: 42vh;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.intro-header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 100%, rgba(212,168,67,0.15) 0%, transparent 70%),
+    linear-gradient(180deg, #0a0805 0%, transparent 50%);
+  z-index: 1;
+}
+
+.castle-art {
+  font-size: 90px;
+  position: relative;
+  z-index: 2;
+  filter: drop-shadow(0 0 40px rgba(212,168,67,0.5));
+  animation: throneGlow 4s ease-in-out infinite;
+}
+
+@keyframes throneGlow {
+  0%,100% { filter: drop-shadow(0 0 30px rgba(212,168,67,0.4)); transform: scale(1); }
+  50% { filter: drop-shadow(0 0 60px rgba(212,168,67,0.7)); transform: scale(1.03); }
+}
+
+.intro-body {
+  flex: 1;
+  width: 100%;
+  padding: 0 24px 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  overflow-y: auto;
+}
+
+.game-logo {
+  text-align: center;
+}
+
+.game-logo-ar {
+  font-family: 'Amiri', serif;
+  font-size: 44px;
+  font-weight: 700;
+  letter-spacing: 6px;
+  background: linear-gradient(180deg, var(--gold2) 0%, var(--gold) 50%, var(--gold3) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1;
+}
+
+.game-logo-sub {
+  font-size: 13px;
+  color: var(--text2);
+  letter-spacing: 4px;
+  margin-top: 4px;
+  opacity: 0.7;
+}
+
+.gold-ornament {
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold3), var(--gold), var(--gold3), transparent);
+  position: relative;
+}
+.gold-ornament::before {
+  content: '✦';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  color: var(--gold);
+  font-size: 12px;
+  background: var(--dark);
+  padding: 0 8px;
+}
+
+.intro-lore {
+  font-family: 'Amiri', serif;
+  font-size: 16px;
+  line-height: 2.1;
+  color: var(--text2);
+  text-align: center;
+  font-style: italic;
+}
+
+.intro-lore em {
+  color: var(--gold2);
+  font-style: normal;
+}
+
+/* Faction preview */
+.factions-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  width: 100%;
+}
+
+.faction-card {
+  background: rgba(212,168,67,0.05);
+  border: 1px solid rgba(212,168,67,0.15);
+  border-radius: 12px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.faction-icon { font-size: 20px; }
+.faction-info { flex: 1; }
+.faction-name { font-size: 12px; color: var(--gold2); font-weight: 700; }
+.faction-desc { font-size: 10px; color: var(--text2); margin-top: 1px; }
+
+/* Name section */
+.name-section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.name-label {
+  font-family: 'Amiri', serif;
+  font-size: 15px;
+  color: var(--gold);
+  text-align: center;
+}
+
+.name-input {
+  width: 100%;
+  background: rgba(212,168,67,0.06);
+  border: 1px solid rgba(212,168,67,0.35);
+  border-radius: 12px;
+  padding: 14px 18px;
+  color: var(--gold2);
+  font-family: 'Scheherazade New', serif;
+  font-size: 18px;
+  text-align: center;
+  outline: none;
+  transition: border-color 0.3s;
+}
+.name-input:focus { border-color: var(--gold); box-shadow: 0 0 20px rgba(212,168,67,0.1); }
+.name-input::placeholder { color: rgba(212,168,67,0.3); }
+
+.start-btn {
+  width: 100%;
+  background: linear-gradient(135deg, #c9a843, #8b6914);
+  border: none;
+  border-radius: 14px;
+  padding: 17px;
+  color: var(--dark);
+  font-family: 'Amiri', serif;
+  font-size: 20px;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 1px;
+  box-shadow: 0 4px 30px rgba(212,168,67,0.25), inset 0 1px 0 rgba(255,255,255,0.15);
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+.start-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.1));
+}
+.start-btn:active { transform: scale(0.98); box-shadow: 0 2px 15px rgba(212,168,67,0.2); }
+
+/* =====================
+   GAME SCREEN
+   ===================== */
+#game { background: transparent; }
+
+/* Stats bar */
+.stats-bar {
+  flex-shrink: 0;
+  background: rgba(8,6,4,0.9);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(212,168,67,0.15);
+  padding: 8px 14px;
+  position: relative;
+  z-index: 10;
+}
+
+.stats-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.king-title {
+  font-family: 'Amiri', serif;
+  color: var(--gold);
+  font-size: 13px;
+}
+
+.chapter-indicator {
+  font-size: 10px;
+  color: var(--text2);
+  background: rgba(212,168,67,0.08);
+  border: 1px solid rgba(212,168,67,0.15);
+  border-radius: 20px;
+  padding: 3px 10px;
+}
+
+.factions-bar {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 6px;
+}
+
+.faction-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.faction-stat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.faction-stat-name {
+  font-size: 9px;
+  color: var(--text2);
+}
+
+.faction-stat-num {
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.faction-bar-bg {
+  height: 4px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.faction-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.6s cubic-bezier(0.4,0,0.2,1);
+}
+
+.f-people .faction-bar-fill { background: linear-gradient(90deg, #2a7a5a, #4caf8c); }
+.f-nobles .faction-bar-fill { background: linear-gradient(90deg, #5a3a7a, #8c6caf); }
+.f-army .faction-bar-fill { background: linear-gradient(90deg, #7a1515, #c94c4c); }
+.f-church .faction-bar-fill { background: linear-gradient(90deg, #3a3a5a, #6c6caf); }
+
+.f-people .faction-stat-num { color: #4caf8c; }
+.f-nobles .faction-stat-num { color: #8c6caf; }
+.f-army .faction-stat-num { color: #c94c4c; }
+.f-church .faction-stat-num { color: #8c8ccf; }
+
+/* Scene */
+.scene-container {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  display: flex;
+  flex-direction: column;
+}
+
+.scene-visual {
+  width: 100%;
+  height: 180px;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.scene-emoji {
+  font-size: 72px;
+  position: relative;
+  z-index: 2;
+  animation: sceneFloat 5s ease-in-out infinite;
+  filter: drop-shadow(0 0 30px var(--scene-color, rgba(212,168,67,0.4)));
+}
+
+@keyframes sceneFloat {
+  0%,100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-8px) scale(1.02); }
+}
+
+.scene-visual::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100px;
+  background: linear-gradient(transparent, var(--dark2));
+  z-index: 3;
+}
+
+/* Scene mood overlay */
+.mood-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  transition: background 0.8s ease;
+}
+
+.scene-text-area {
+  padding: 16px 20px 0;
+  flex: 1;
+}
+
+/* Memory tag */
+.memory-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(212,168,67,0.08);
+  border: 1px solid rgba(212,168,67,0.2);
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-size: 11px;
+  color: var(--gold2);
+  margin-bottom: 10px;
+  animation: memoryPop 0.4s ease;
+}
+@keyframes memoryPop {
+  from { opacity:0; transform: scale(0.9); }
+  to { opacity:1; transform: scale(1); }
+}
+
+.chapter-tag {
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: var(--gold3);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.scene-title {
+  font-family: 'Amiri', serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--gold2);
+  line-height: 1.25;
+  margin-bottom: 14px;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+
+.scene-body {
+  font-family: 'Amiri', serif;
+  font-size: 17px;
+  line-height: 2.1;
+  color: var(--text);
+}
+
+.scene-body .char-name {
+  color: var(--gold2);
+  font-weight: 700;
+}
+
+.scene-body .dramatic {
+  color: #e88888;
+  font-weight: 700;
+}
+
+.scene-body .good-word {
+  color: #88e8a8;
+}
+
+.scene-body .whisper {
+  color: var(--text2);
+  font-style: italic;
+  font-size: 15px;
+}
+
+/* Choices */
+.choices-section {
+  padding: 14px 16px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  flex-shrink: 0;
+}
+
+.choices-header {
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--text2);
+  margin-bottom: 2px;
+  text-align: center;
+}
+
+.choice-btn {
+  background: rgba(212,168,67,0.06);
+  border: 1px solid rgba(212,168,67,0.2);
+  border-radius: 14px;
+  padding: 13px 16px;
+  width: 100%;
+  text-align: right;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  position: relative;
+  overflow: hidden;
+}
+
+.choice-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(212,168,67,0.08), transparent);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.choice-btn:active {
+  transform: scale(0.975);
+  border-color: var(--gold);
+  background: rgba(212,168,67,0.12);
+}
+.choice-btn:active::before { opacity: 1; }
+
+.choice-emoji {
+  font-size: 24px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.choice-content { flex: 1; }
+
+.choice-text {
+  font-family: 'Scheherazade New', serif;
+  font-size: 15px;
+  color: var(--parchment);
+  line-height: 1.6;
+}
+
+.choice-effects {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.effect-pill {
+  font-size: 10px;
+  padding: 2px 7px;
+  border-radius: 20px;
+  font-weight: 700;
+}
+
+.effect-up { background: rgba(76,175,140,0.15); color: #4caf8c; border: 1px solid rgba(76,175,140,0.3); }
+.effect-down { background: rgba(201,76,76,0.15); color: #e88888; border: 1px solid rgba(201,76,76,0.3); }
+.effect-neutral { background: rgba(212,168,67,0.1); color: var(--gold2); border: 1px solid rgba(212,168,67,0.2); }
+
+/* Stat flash animation */
+@keyframes statUp {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.3); color: #88e8a8; }
+  100% { transform: scale(1); }
+}
+@keyframes statDown {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.3); color: #e88888; }
+  100% { transform: scale(1); }
+}
+.flash-up { animation: statUp 0.5s ease; }
+.flash-down { animation: statDown 0.5s ease; }
+
+/* Reaction toast */
+.reaction-toast {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: rgba(8,6,4,0.97);
+  border: 1px solid rgba(212,168,67,0.3);
+  border-radius: 12px;
+  padding: 10px 18px;
+  font-family: 'Amiri', serif;
+  font-size: 14px;
+  color: var(--gold2);
+  z-index: 60;
+  opacity: 0;
+  transition: all 0.3s ease;
+  pointer-events: none;
+  white-space: nowrap;
+  max-width: 90vw;
+  text-align: center;
+}
+.reaction-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Mobile fix: wrap pills better */
+@media (max-width: 360px) {
+  .choice-text { font-size: 13px; }
+  .effect-pill { font-size: 9px; padding: 2px 5px; }
+  .choice-btn { padding: 10px 12px; gap: 8px; }
+  .choice-emoji { font-size: 20px; }
+}
+
+/* =====================
+   TRANSITION OVERLAY
+   ===================== */
+.transition-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--dark);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease;
+}
+
+.transition-overlay.show { opacity: 1; pointer-events: all; }
+
+.transition-content {
+  text-align: center;
+  font-family: 'Amiri', serif;
+  font-size: 22px;
+  color: var(--gold);
+  opacity: 0;
+  transform: scale(0.9);
+  transition: all 0.3s ease 0.1s;
+}
+.transition-overlay.show .transition-content {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* =====================
+   CONSEQUENCE BANNER
+   ===================== */
+.consequence-banner {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: 440px;
+  background: rgba(8,6,4,0.97);
+  border: 1px solid rgba(212,168,67,0.4);
+  border-top: none;
+  border-radius: 0 0 16px 16px;
+  padding: 12px 20px;
+  z-index: 50;
+  text-align: center;
+  font-family: 'Amiri', serif;
+  font-size: 15px;
+  color: var(--gold2);
+  line-height: 1.6;
+  transform: translateX(-50%) translateY(-100%);
+  transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
+}
+.consequence-banner.visible { transform: translateX(-50%) translateY(0); }
+.consequence-banner .con-icon { font-size: 22px; display: block; margin-bottom: 4px; }
+
+/* =====================
+   ENDING SCREEN
+   ===================== */
+#ending {
+  align-items: center;
+  padding: 0;
+  overflow-y: auto;
+}
+
+.ending-header {
+  width: 100%;
+  min-height: 280px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 40px 24px 30px;
+}
+
+.ending-bg-glow {
+  position: absolute;
+  inset: 0;
+  opacity: 0.3;
+  background: radial-gradient(ellipse 80% 70% at 50% 100%, var(--ending-color, #c9a843) 0%, transparent 70%);
+}
+
+.ending-seal {
+  font-size: 90px;
+  position: relative;
+  z-index: 2;
+  animation: throneGlow 4s ease-in-out infinite;
+}
+
+.ending-title {
+  font-family: 'Amiri', serif;
+  font-size: 34px;
+  font-weight: 700;
+  text-align: center;
+  position: relative;
+  z-index: 2;
+  margin-top: 12px;
+  line-height: 1.2;
+}
+
+.ending-rank {
+  font-size: 12px;
+  letter-spacing: 3px;
+  color: var(--text2);
+  position: relative;
+  z-index: 2;
+  margin-top: 6px;
+}
+
+.ending-body {
+  padding: 0 22px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+}
+
+.ending-story {
+  font-family: 'Amiri', serif;
+  font-size: 17px;
+  line-height: 2.2;
+  color: var(--text2);
+  text-align: center;
+  font-style: italic;
+}
+
+.ending-story strong {
+  color: var(--gold2);
+  font-style: normal;
+}
+
+/* Faction final standings */
+.faction-standings {
+  background: rgba(212,168,67,0.05);
+  border: 1px solid rgba(212,168,67,0.15);
+  border-radius: 16px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.standings-title {
+  font-family: 'Amiri', serif;
+  font-size: 16px;
+  color: var(--gold);
+  text-align: center;
+  margin-bottom: 2px;
+}
+
+.standing-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.standing-icon { font-size: 20px; flex-shrink: 0; }
+
+.standing-info { flex: 1; }
+.standing-name { font-size: 12px; color: var(--text2); }
+
+.standing-bar-wrap {
+  height: 6px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 3px;
+  margin-top: 4px;
+  overflow: hidden;
+}
+
+.standing-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 1s ease 0.3s;
+}
+
+.standing-val {
+  font-size: 13px;
+  font-weight: 700;
+  min-width: 32px;
+  text-align: left;
+}
+
+/* Chronicle */
+.chronicle-box {
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(212,168,67,0.1);
+  border-radius: 16px;
+  padding: 18px;
+}
+
+.chronicle-title {
+  font-family: 'Amiri', serif;
+  font-size: 15px;
+  color: var(--gold);
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.chronicle-entry {
+  display: flex;
+  gap: 10px;
+  padding: 7px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  font-size: 13px;
+  color: var(--text2);
+}
+.chronicle-entry:last-child { border-bottom: none; }
+.chronicle-icon { font-size: 14px; flex-shrink: 0; }
+
+.replay-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+}
+
+.btn-gold {
+  width: 100%;
+  background: linear-gradient(135deg, #c9a843, #8b6914);
+  border: none;
+  border-radius: 14px;
+  padding: 16px;
+  color: var(--dark);
+  font-family: 'Amiri', serif;
+  font-size: 19px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 20px rgba(212,168,67,0.2);
+}
+.btn-gold:active { transform: scale(0.97); }
+
+.btn-outline {
+  width: 100%;
+  background: transparent;
+  border: 1px solid rgba(212,168,67,0.3);
+  border-radius: 14px;
+  padding: 13px;
+  color: var(--gold2);
+  font-family: 'Amiri', serif;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-outline:active { background: rgba(212,168,67,0.08); }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(212,168,67,0.2); border-radius: 3px; }
+
+/* Pulse anim for critical low stats */
+@keyframes criticalPulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(201,76,76,0); }
+  50% { box-shadow: 0 0 0 6px rgba(201,76,76,0.2); }
+}
+.critical-warning { animation: criticalPulse 1.5s ease infinite; }
+
+@keyframes fadeIn {
+  from { opacity:0; }
+  to { opacity:1; }
+}
+</style>
+</head>
+<body>
+
+<!-- Background canvas -->
+<canvas id="bgCanvas"></canvas>
+
+<!-- Transition overlay -->
+<div class="transition-overlay" id="transOverlay">
+  <div class="transition-content" id="transContent"></div>
+</div>
+
+<!-- Consequence banner -->
+<div class="consequence-banner" id="conBanner">
+  <span class="con-icon" id="conIcon"></span>
+  <span id="conText"></span>
+</div>
+
+<!-- Reaction toast -->
+<div class="reaction-toast" id="reactionToast"></div>
+
+<!-- ══ SPLASH SCREEN ══ -->
+<div id="splash">
+  <div class="splash-logo">
+    <div class="logo-mark">
+      <div class="logo-mark-ring"></div>
+      <div class="logo-mark-ring"></div>
+      <div class="logo-mark-ring"></div>
+      <div class="logo-mark-crown">👑</div>
+    </div>
+    <div class="logo-wordmark">
+      <div class="logo-title-ar">أريهان</div>
+      <div class="logo-tagline">مملكة القرار والمصير</div>
+    </div>
+  </div>
+  <div class="splash-loader">
+    <div class="splash-loader-fill"></div>
+  </div>
+  <div class="splash-hint">المملكة تنتظرك...</div>
+</div>
+
+<div id="app">
+
+  <!-- ══ INTRO ══ -->
+  <div class="screen active" id="intro">
+    <div class="intro-header">
+      <div class="castle-art">🏰</div>
+    </div>
+    <div class="intro-body">
+      <div class="game-logo">
+        <div class="game-logo-ar">أريهان</div>
+        <div class="game-logo-sub">مملكة القرار والمصير</div>
+      </div>
+
+      <div class="gold-ornament"></div>
+
+      <p class="intro-lore">
+        مملكة <em>أريهان</em> تنزف من الداخل.
+        الملك الراحل ترك وراءه ديوناً، فصائل متناحرة، وعرشاً ثقيلاً.
+        أنت الوريث الوحيد.
+        <br><br>
+        كل قرار تتخذه سيُحكى في سجلات التاريخ
+        — أو يُطمس إلى الأبد.
+      </p>
+
+      <div class="gold-ornament"></div>
+
+      <div class="factions-grid">
+        <div class="faction-card">
+          <span class="faction-icon">🏘️</span>
+          <div class="faction-info">
+            <div class="faction-name">الشعب</div>
+            <div class="faction-desc">قوتك الحقيقية</div>
+          </div>
+        </div>
+        <div class="faction-card">
+          <span class="faction-icon">🗡️</span>
+          <div class="faction-info">
+            <div class="faction-name">الجيش</div>
+            <div class="faction-desc">حراس العرش</div>
+          </div>
+        </div>
+        <div class="faction-card">
+          <span class="faction-icon">💎</span>
+          <div class="faction-info">
+            <div class="faction-name">النبلاء</div>
+            <div class="faction-desc">أصحاب الثروة</div>
+          </div>
+        </div>
+        <div class="faction-card">
+          <span class="faction-icon">⛪</span>
+          <div class="faction-info">
+            <div class="faction-name">الكنيسة</div>
+            <div class="faction-desc">شرعية الحكم</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="name-section">
+        <div class="name-label">✦ ما اسمك أيها الملك؟ ✦</div>
+        <input class="name-input" id="kingInput" type="text" placeholder="اكتب اسمك هنا..." maxlength="18" autocomplete="off">
+      </div>
+
+      <button class="start-btn" onclick="startGame()">⚔️ تسلّم العرش ⚔️</button>
+    </div>
+  </div>
+
+  <!-- ══ GAME ══ -->
+  <div class="screen" id="game">
+    <div class="stats-bar">
+      <div class="stats-top">
+        <div class="king-title" id="kingTitleBar">الملك</div>
+        <div class="chapter-indicator" id="chapterIndicator">الفصل ١</div>
+      </div>
+      <div class="factions-bar">
+        <div class="faction-stat f-people">
+          <div class="faction-stat-header">
+            <span class="faction-stat-name">🏘️ الشعب</span>
+            <span class="faction-stat-num" id="num-people">60</span>
+          </div>
+          <div class="faction-bar-bg"><div class="faction-bar-fill" id="bar-people"></div></div>
+        </div>
+        <div class="faction-stat f-army">
+          <div class="faction-stat-header">
+            <span class="faction-stat-name">🗡️ الجيش</span>
+            <span class="faction-stat-num" id="num-army">60</span>
+          </div>
+          <div class="faction-bar-bg"><div class="faction-bar-fill" id="bar-army"></div></div>
+        </div>
+        <div class="faction-stat f-nobles">
+          <div class="faction-stat-header">
+            <span class="faction-stat-name">💎 النبلاء</span>
+            <span class="faction-stat-num" id="num-nobles">60</span>
+          </div>
+          <div class="faction-bar-bg"><div class="faction-bar-fill" id="bar-nobles"></div></div>
+        </div>
+        <div class="faction-stat f-church">
+          <div class="faction-stat-header">
+            <span class="faction-stat-name">⛪ الكنيسة</span>
+            <span class="faction-stat-num" id="num-church">60</span>
+          </div>
+          <div class="faction-bar-bg"><div class="faction-bar-fill" id="bar-church"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="scene-container" id="sceneContainer">
+      <div class="scene-visual" id="sceneVisual">
+        <div class="mood-overlay" id="moodOverlay"></div>
+        <div class="scene-emoji" id="sceneEmoji"></div>
+      </div>
+      <div class="scene-text-area">
+        <div class="memory-tag" id="memoryTag" style="display:none">📜 <span id="memoryText"></span></div>
+        <div class="chapter-tag" id="chapterTag"></div>
+        <div class="scene-title" id="sceneTitle"></div>
+        <div class="scene-body" id="sceneBody"></div>
+      </div>
+      <div class="choices-section">
+        <div class="choices-header">— اختر قرارك أيها الملك —</div>
+        <div id="choicesList"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ ENDING ══ -->
+  <div class="screen" id="ending">
+    <div class="ending-header">
+      <div class="ending-bg-glow" id="endingGlow"></div>
+      <div class="ending-seal" id="endingSeal"></div>
+      <div class="ending-title" id="endingTitle"></div>
+      <div class="ending-rank" id="endingRank"></div>
+    </div>
+    <div class="ending-body">
+      <div class="gold-ornament"></div>
+      <p class="ending-story" id="endingStory"></p>
+      <div class="faction-standings" id="factionStandings"></div>
+      <div class="chronicle-box">
+        <div class="chronicle-title">📜 سجل قرارات الملك</div>
+        <div id="chronicle"></div>
+      </div>
+      <div class="replay-section">
+        <button class="btn-gold" onclick="restartGame()">🔄 العب مجدداً بمسار مختلف</button>
+        <button class="btn-outline" onclick="shareResult()">📜 شارك نهايتك</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// PARTICLES
+// ═══════════════════════════════════════════
+const canvas = document.getElementById('bgCanvas');
+const ctx = canvas.getContext('2d');
+let particles = [];
+
+function initCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  particles = [];
+  for(let i = 0; i < 80; i++) {
+    particles.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      r: Math.random() * 1.2 + 0.3,
+      alpha: Math.random() * 0.6 + 0.1,
+      speed: Math.random() * 0.15 + 0.05,
+      twinkle: Math.random() * Math.PI * 2,
+      twinkleSpeed: Math.random() * 0.02 + 0.005,
+    });
+  }
+}
+
+function drawParticles() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = '#080604';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  particles.forEach(p => {
+    p.twinkle += p.twinkleSpeed;
+    p.y -= p.speed;
+    if(p.y < -2) p.y = canvas.height + 2;
+    const a = p.alpha * (0.6 + 0.4 * Math.sin(p.twinkle));
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(212,180,120,${a})`;
+    ctx.fill();
+  });
+
+  requestAnimationFrame(drawParticles);
+}
+
+initCanvas();
+drawParticles();
+window.addEventListener('resize', initCanvas);
+
+// ═══════════════════════════════════════════
+// GAME STATE
+// ═══════════════════════════════════════════
+let G = {
+  name: '',
+  people: 60, army: 60, nobles: 60, church: 60,
+  choices: [],
+  tags: new Set(),
+  seenEvents: new Set(),
+  turn: 0,
+};
+
+// ═══════════════════════════════════════════
+// SCENARIOS DATABASE
+// ═══════════════════════════════════════════
+const SCENES = {
+
+  // ── SCENE 1: The Debt ──
+  debt: {
+    chapter: 'الفصل الأول — وراثة الأعباء',
+    title: 'ديون الأب',
+    emoji: '🏛️',
+    mood: 'radial-gradient(ellipse at 50% 120%, rgba(140,100,20,0.4) 0%, transparent 60%)',
+    text: () => `
+      يُناديك <span class="char-name">وزيرك الأكبر، سليمان الحكيم</span>، فور جلوسك على العرش.
+      وجهه شاحب كأنه يحمل خبراً يكسر الظهر.
+      <br><br>
+      <span class="whisper">"جلالة الملك... خزيننا مثقل بديون أبيك رحمه الله. إن لم ندفع للمصارف الشمالية خلال أربعين يوماً، سيُرسلون محصّلين مسلحين."</span>
+      <br><br>
+      ثلاثة وجوه تتطلع إليك في القاعة: تاجر النبلاء <span class="char-name">يوسف الثري</span>، القائد العسكري <span class="char-name">طارق بن خالد</span>، والأسقف <span class="char-name">يوحنا الوقور</span>.
+      كلٌّ منهم لديه حل — وكلٌّ منهم يريد ثمناً.
+    `,
+    memory: null,
+    choices: [
+      {
+        emoji: '💎', text: 'أفرض ضريبة طارئة على النبلاء وكبار التجار',
+        sub: [
+          { label: '+خزينة', type: 'up' }, { label: '−النبلاء −15', type: 'down' }, { label: '+الشعب +5', type: 'up' }
+        ],
+        fn: () => {
+          apply({nobles:-15, people:5});
+          G.tags.add('taxed_nobles');
+          chronicle('💎', 'فرض ضريبة على النبلاء');
+          transition('⚖️', 'النبلاء يتذمرون... لكن الخزينة تنفس', () => go('drought'));
+        }
+      },
+      {
+        emoji: '⚔️', text: 'أطلب من الجيش التنازل عن مكافآتهم مؤقتاً مقابل وعد بالمضاعفة',
+        sub: [
+          { label: '−الجيش −20', type: 'down' }, { label: '+شرف الملك', type: 'up' }, { label: 'خطر: الجيش غاضب', type: 'neutral' }
+        ],
+        fn: () => {
+          apply({army:-20, church:5});
+          G.tags.add('army_debt');
+          chronicle('⚔️', 'طلب تضحية من الجيش بوعد بالمضاعفة');
+          transition('🗡️', 'الجند يتذمرون خلف ظهرك...', () => go('drought'));
+        }
+      },
+      {
+        emoji: '⛪', text: 'أطلب قرضاً من خزينة الكنيسة مقابل امتيازات دينية',
+        sub: [
+          { label: '+خزينة', type: 'up' }, { label: '−سيادة الملك', type: 'down' }, { label: '+الكنيسة +15', type: 'up' }
+        ],
+        fn: () => {
+          apply({church:15, nobles:-5});
+          G.tags.add('church_debt');
+          chronicle('⛪', 'استعار من الكنيسة مقابل امتيازات');
+          transition('✝️', 'الأسقف يبتسم... للكنيسة الآن ثمن', () => go('drought'));
+        }
+      },
+    ]
+  },
+
+  // ── SCENE 2: Drought ──
+  drought: {
+    chapter: 'الفصل الثاني — الأرض الظامئة',
+    title: 'صيف الجحيم',
+    emoji: '🌾',
+    mood: 'radial-gradient(ellipse at 50% 120%, rgba(120,60,10,0.5) 0%, transparent 60%)',
+    text: () => {
+      const base = `
+        ثلاثة أشهر بلا مطر. محاصيل القرى الجنوبية تموت في الحقول، والفلاحون يسيرون نحو العاصمة بوجوه يابسة كالطين المتشقق.
+        <br><br>
+        <span class="char-name">سليمان الحكيم</span> يضع أمامك تقريراً: <span class="whisper">"إن لم نتدخل خلال أسبوعين، ستبدأ وفيات الأطفال."</span>
+        <br><br>
+      `;
+      if (G.tags.has('taxed_nobles')) return base + `النبلاء الذين فرضت عليهم الضريبة <span class="dramatic">يُحجمون عن المساعدة</span> احتجاجاً. الوضع أصعب مما كان يجب.`;
+      if (G.tags.has('army_debt')) return base + `الجنود الغاضبون <span class="dramatic">يبطئون</span> توزيع الإمدادات على القرى. الوضع يتأزم.`;
+      if (G.tags.has('church_debt')) return base + `<span class="good-word">الكنيسة تفتح أبوابها</span> للجائعين بدون أن تستأذن — وتُحسب لها لا لك.`;
+      return base + `المجاعة تقترب بخطى ثابتة.`;
+    },
+    memory: () => G.tags.has('taxed_nobles') ? '📌 النبلاء لا يزالون غاضبين من الضريبة' :
+                  G.tags.has('army_debt') ? '📌 الجيش لم ينسَ ما طلبت منه في الأزمة الأولى' :
+                  G.tags.has('church_debt') ? '📌 الكنيسة الآن لاعب قوي في المشهد' : null,
+    choices: [
+      {
+        emoji: '🏠', text: 'افتح مخازن الحبوب الملكية مجاناً للشعب',
+        sub: [{ label: '+الشعب +25', type: 'up' }, { label: '−مخزون −الجيش −10', type: 'down' }],
+        fn: () => {
+          apply({people:25, army:-10});
+          G.tags.add('opened_stores');
+          chronicle('🏠', 'فتح المخازن الملكية للشعب مجاناً');
+          transition('❤️', 'الشعب يهتف باسمك في الشوارع!', () => go('rebellion'));
+        }
+      },
+      {
+        emoji: '⛏️', text: 'أرسل الجيش لحفر قنوات ري من النهر الشمالي',
+        sub: [{ label: '+الشعب +15', type: 'up' }, { label: '+النبلاء +5', type: 'up' }, { label: '−الجيش −15 مؤقتاً', type: 'down' }],
+        fn: () => {
+          apply({people:15, nobles:5, army:-15});
+          G.tags.add('dug_canals');
+          chronicle('⛏️', 'أمر الجيش بحفر قنوات الري');
+          transition('💧', 'الماء يتدفق... والأرض تتنفس', () => go('rebellion'));
+        }
+      },
+      {
+        emoji: '💰', text: 'اشترِ الحبوب من التجار الشماليين بسعر مرتفع',
+        sub: [{ label: '+الشعب +10', type: 'up' }, { label: '−خزينة كبير', type: 'down' }, { label: '+النبلاء +10', type: 'up' }],
+        fn: () => {
+          apply({people:10, nobles:10, church:-5});
+          G.tags.add('bought_grain');
+          chronicle('💰', 'شراء الحبوب بأموال الخزينة');
+          transition('🌾', 'الحبوب وصلت... لكن الخزينة نزت', () => go('rebellion'));
+        }
+      },
+    ]
+  },
+
+  // ── SCENE 3: Rebellion ──
+  rebellion: {
+    chapter: 'الفصل الثالث — الفتنة تشبّ',
+    title: 'أمير الشرق يقطع بيعته',
+    emoji: '⚡',
+    mood: 'radial-gradient(ellipse at 50% 120%, rgba(120,20,20,0.5) 0%, transparent 60%)',
+    text: () => {
+      const amirName = '<span class="char-name">الأمير كمال بن عرفان</span>';
+      const base = `
+        رسالة مُسرَّبة من القصر الشرقي: ${amirName} يُصرّح أن العرش يستحق مَن هو أجدر.
+        وقد أوقف دفع الضرائب، وسحب جنوده من الحدود الشمالية.
+        <br><br>
+        <span class="char-name">طارق بن خالد</span> يضرب الطاولة بقبضته: <span class="whisper">"دعني أسير إليه الآن، جلالتك. هذا المتمرد لا يستحق الحوار."</span>
+        <br><br>
+      `;
+      if (G.tags.has('opened_stores')) return base + `<span class="good-word">شعبك يقف خلفك</span> بقوة — لكن الجيش لا يزال متذبذباً.`;
+      if (G.tags.has('army_debt')) return base + `<span class="dramatic">الجنود يترددون</span> في الامتثال للأوامر — ذكرى الديون لا تزال طازجة في أذهانهم.`;
+      return base + `الموقف حرج، وكل خطوة لها ثمن.`;
+    },
+    memory: () => G.tags.has('army_debt') ? '⚠️ الجيش لم ينسَ ما طلبته منه سابقاً' :
+                  G.tags.has('opened_stores') ? '💚 الشعب يؤيدك — استثمر هذا' : null,
+    choices: [
+      {
+        emoji: '⚔️', text: 'أرسل جيشاً لإخماد التمرد فوراً وبالقوة',
+        sub: [{ label: '+الجيش +10', type: 'up' }, { label: '−الشعب −20', type: 'down' }, { label: '+النبلاء +5', type: 'up' }],
+        fn: () => {
+          const penalty = G.tags.has('army_debt') ? -15 : 0;
+          apply({army: 10 + penalty, people:-20, nobles:5});
+          G.tags.add('crushed_rebel');
+          chronicle('⚔️', 'أخمد تمرد الأمير كمال بالقوة');
+          transition('🗡️', 'المدينة الشرقية سقطت... لكن الدم يستوجب الدم', () => go('invasion'));
+        }
+      },
+      {
+        emoji: '🤝', text: 'أدعو الأمير لمأدبة وأعرض عليه منصب المستشار الأول',
+        sub: [{ label: '+الكنيسة +10', type: 'up' }, { label: '+الشعب +10', type: 'up' }, { label: '−النبلاء −10', type: 'down' }],
+        fn: () => {
+          apply({church:10, people:10, nobles:-10});
+          G.tags.add('diplomacy_rebel');
+          chronicle('🤝', 'تفاوض مع الأمير وأعطاه منصباً');
+          transition('🕊️', 'الأمير قبل... النبلاء الآخرون يتساءلون: هل يمكننا نحن أيضاً؟', () => go('invasion'));
+        }
+      },
+      {
+        emoji: '📜', text: 'اتهمه علناً بالخيانة وانتظر دعم الفصائل',
+        sub: [{ label: '+الكنيسة +15', type: 'up' }, { label: '−الجيش −5', type: 'down' }, { label: 'نتيجة غير مضمونة', type: 'neutral' }],
+        fn: () => {
+          const churchBonus = G.tags.has('church_debt') ? 20 : 15;
+          apply({church: churchBonus, army:-5, people: 5});
+          G.tags.add('public_accusation');
+          chronicle('📜', 'اتهم الأمير علناً وانتظر الدعم');
+          transition('⚖️', 'الشعب يحكم... والتاريخ يراقب', () => go('invasion'));
+        }
+      },
+    ]
+  },
+
+  // ── SCENE 4: Invasion ──
+  invasion: {
+    chapter: 'الفصل الرابع — الغزو',
+    title: 'أسود الشمال تزحف',
+    emoji: '🐺',
+    mood: 'radial-gradient(ellipse at 50% 120%, rgba(80,20,80,0.5) 0%, transparent 60%)',
+    text: () => {
+      const base = `
+        ثلاثون ألف جندي من مملكة <span class="char-name">الثندار الشمالية</span> يعبرون الحدود.
+        قائدهم <span class="char-name">الجنرال فولكو</span> يُرسل رسالة وحيدة: <span class="dramatic">"استسلموا أو نحرق القرى واحدة تلو الأخرى."</span>
+        <br><br>
+        مجلس الحرب ينعقد في غرفة دخانها يخنق الأنفاس.
+        <br><br>
+      `;
+      if (G.tags.has('crushed_rebel') && G.tags.has('dug_canals')) return base + `جيشك <span class="good-word">موحّد ومورالي مرتفع</span>، وقنوات الري تجعل المدن أقل حاجة للمؤن.`;
+      if (G.tags.has('diplomacy_rebel')) return base + `<span class="char-name">الأمير كمال</span> يُعرض عليك جنوده من الشرق — ربما قراره الدبلوماسي ثمّر!`;
+      if (G.tags.has('army_debt')) return base + `<span class="dramatic">بعض قادة الجيش يتذمرون بصوت عالٍ</span> — وعدهم بالمضاعفة لم يتحقق بعد.`;
+      return base + `المعركة تلوح في الأفق، والوقت ينفد.`;
+    },
+    memory: () => {
+      if (G.tags.has('diplomacy_rebel')) return '🤝 الأمير كمال الآن حليفك';
+      if (G.tags.has('crushed_rebel')) return '⚔️ جيشك محارب ومنتصر';
+      if (G.tags.has('army_debt')) return '⚠️ الجيش لم يُكافَأ بعد كما وعدت';
+      return null;
+    },
+    choices: [
+      {
+        emoji: '🗡️', text: 'اخرج بنفسك على رأس الجيش وقاتل دفاعاً عن الوطن',
+        sub: [{ label: '+الجيش +20', type: 'up' }, { label: '+الشعب +15', type: 'up' }, { label: 'خطر على الملك', type: 'neutral' }],
+        fn: () => {
+          const bonus = G.tags.has('diplomacy_rebel') ? 10 : 0;
+          apply({army:20+bonus, people:15, nobles:5});
+          G.tags.add('led_battle');
+          chronicle('🗡️', 'قاد الجيش شخصياً في المعركة');
+          transition('⚔️', 'الملك يقاتل! المورال يرتفع للسماء!', () => go('plague'));
+        }
+      },
+      {
+        emoji: '🏳️', text: 'اعرض التفاوض مقابل التنازل عن الأراضي الحدودية',
+        sub: [{ label: '+الشعب +10', type: 'up' }, { label: '−النبلاء −15', type: 'down' }, { label: '−شرف الملك', type: 'down' }],
+        fn: () => {
+          apply({people:10, nobles:-15, church:-5});
+          G.tags.add('surrendered_land');
+          chronicle('🏳️', 'تنازل عن أراضي حدودية لوقف الحرب');
+          transition('📜', 'السلام جاء... لكن بثمن يجرح الكبرياء', () => go('plague'));
+        }
+      },
+      {
+        emoji: '🔥', text: 'استخدم تكتيك الأرض المحروقة وأخلِ الحدود كمصيدة',
+        sub: [{ label: '+الجيش +15', type: 'up' }, { label: '−الشعب −10', type: 'down' }, { label: '+النبلاء +5', type: 'up' }],
+        fn: () => {
+          apply({army:15, people:-10, nobles:5});
+          G.tags.add('scorched_earth');
+          chronicle('🔥', 'حرق الحدود كمصيدة للغزاة');
+          transition('🌑', 'الغزاة تراجعوا... لكن القرى الحدودية دُمّرت', () => go('plague'));
+        }
+      },
+    ]
+  },
+
+  // ── SCENE 5: Plague ──
+  plague: {
+    chapter: 'الفصل الخامس — الطاعون الأسود',
+    title: 'الموت يطرق الأبواب',
+    emoji: '💀',
+    mood: 'radial-gradient(ellipse at 50% 120%, rgba(30,50,80,0.6) 0%, transparent 60%)',
+    text: () => {
+      const base = `
+        جنود عائدون من الحدود أحضروا معهم أكثر من النصر — أحضروا وباءً لا يُرى.
+        <br><br>
+        في أسبوعين، أُغلقت ثلث حوانيت المدينة. الأطباء يحرقون الجثث ليلاً والدخان يملأ الأفق.
+        <span class="char-name">الأسقف يوحنا</span> يدعو لصلاة عامة، أما <span class="char-name">الطبيب الملكي كاراز</span> فيقول: <span class="whisper">"العزل الصارم هو الحل الوحيد علمياً."</span>
+        <br><br>
+      `;
+      if (G.tags.has('led_battle')) return base + `<span class="good-word">شعبك يثق بك تماماً</span> بعد أن رأوك تقاتل معهم — قراراتك ستُطاع بلا تردد.`;
+      if (G.tags.has('scorched_earth')) return base + `<span class="dramatic">القرى الحدودية المدمرة</span> تُشكّل ملاجئ بائسة لا يمكن عزلها بسهولة — الوضع أعقد.`;
+      if (G.tags.has('church_debt')) return base + `<span class="char-name">الأسقف يوحنا</span> يُذكّرك بالدَّين السابق: <span class="whisper">"نحن هنا لنساعد... كما ساعدنا من قبل."</span>`;
+      return base + `المدينة تنتظر قرارك.`;
+    },
+    memory: () => {
+      if (G.tags.has('church_debt')) return '⛪ الكنيسة تنتظر المقابل لمساعدتها';
+      if (G.tags.has('led_battle')) return '💚 الشعب يثق بقيادتك';
+      if (G.tags.has('scorched_earth')) return '⚠️ القرى الحدودية المدمرة تزيد الأمر صعوبة';
+      return null;
+    },
+    choices: [
+      {
+        emoji: '🚧', text: 'أعزل المدن المصابة عزلاً تاماً حتى لو أضرّ ذلك بالاقتصاد',
+        sub: [{ label: '−الشعب −20', type: 'down' }, { label: '+الجيش +5', type: 'up' }, { label: '+النبلاء +10', type: 'up' }],
+        fn: () => {
+          apply({people:-20, army:5, nobles:10});
+          G.tags.add('isolated');
+          chronicle('🚧', 'عزل المدن المصابة بالكامل');
+          transition('🌑', 'الوباء يتراجع... لكن روح المدينة تنكسر', () => triggerRandomEvent(() => go('betrayal')));
+        }
+      },
+      {
+        emoji: '❤️', text: 'أفتح خزينة الدولة كلها للعلاج — لا أحد يُترك',
+        sub: [{ label: '+الشعب +25', type: 'up' }, { label: '−خزينة −30', type: 'down' }, { label: '−النبلاء −10', type: 'down' }],
+        fn: () => {
+          apply({people:25, nobles:-10, church:10});
+          G.tags.add('healed_all');
+          chronicle('❤️', 'أنفق الخزينة كاملاً على علاج المرضى');
+          transition('❤️', 'لا أحد مات وحيداً... والناس لن ينسوا', () => triggerRandomEvent(() => go('betrayal')));
+        }
+      },
+      {
+        emoji: '⛪', text: 'أطلب من الكنيسة إدارة الأزمة مقابل منح أوسع للمعابد',
+        sub: [{ label: '+الكنيسة +20', type: 'up' }, { label: '+الشعب +10', type: 'up' }, { label: '−سلطة الملك', type: 'down' }],
+        fn: () => {
+          const churchMod = G.tags.has('church_debt') ? 25 : 20;
+          apply({church: churchMod, people:10, nobles:-5});
+          G.tags.add('church_led');
+          chronicle('⛪', 'أوكل إدارة الوباء للكنيسة مقابل امتيازات');
+          transition('✝️', 'الكنيسة تُدير... والملك يراقب', () => triggerRandomEvent(() => go('betrayal')));
+        }
+      },
+    ]
+  },
+
+  // ── SCENE 6: Betrayal ──
+  betrayal: {
+    chapter: 'الفصل السادس — الخنجر من الظهر',
+    title: 'خيانة سليمان الحكيم',
+    emoji: '🗡️',
+    mood: 'radial-gradient(ellipse at 50% 120%, rgba(80,10,10,0.7) 0%, transparent 60%)',
+    text: () => {
+      const base = `
+        في ليلة باردة، تجد رسالة مجهولة تحت وسادتك.<br><br>
+        فيها أدلة مُفصّلة: <span class="char-name">سليمان الحكيم</span>، وزيرك الأكبر الذي رافقك منذ اليوم الأول —
+        هو من أوصى أباك بالقروض المشؤومة التي أثقلت الخزينة.
+        وهو من كان يُسرّب معلومات للثندار قبل الغزو.
+        <br><br>
+        <span class="whisper">ليلى تهمس: "جلالتك... سليمان ليس وحده. لكن إن تصرفت باندفاع، ستُحوّل نصف الديوان ضدك."</span>
+        <br><br>
+      `;
+      if (G.tags.has('diplomacy_rebel')) return base + `<span class="char-name">الأمير كمال</span> حليفك يُؤكد المعلومات: <span class="good-word">"رأيت سليمان يلتقي بجواسيس الثندار بنفسي."</span>`;
+      if (G.tags.has('taxed_nobles')) return base + `<span class="dramatic">النبلاء الغاضبون</span> يدعمون سليمان خلف الكواليس — يرون فيه حليفاً ضدك.`;
+      return base + `القصر يحبس أنفاسه. الجميع يراقب.`;
+    },
+    memory: () => {
+      if (G.tags.has('diplomacy_rebel')) return '🤝 الأمير كمال حليفك — شهادته قوية';
+      if (G.tags.has('taxed_nobles')) return '⚠️ النبلاء ضدك — احذر من التصعيد';
+      return '🗡️ سليمان كان أقرب الناس إليك';
+    },
+    choices: [
+      {
+        emoji: '⚖️', text: 'أعقد محاكمة علنية وأعرض الأدلة أمام الفصائل كلها',
+        sub: [{ label: '+الشعب +15', type: 'up' }, { label: '+الكنيسة +10', type: 'up' }, { label: '−النبلاء −15', type: 'down' }],
+        fn: () => {
+          apply({people:15, church:10, nobles:-15});
+          G.tags.add('public_trial');
+          chronicle('⚖️', 'حاكم سليمان علناً أمام الشعب');
+          transition('⚖️', 'المحاكمة تهزّ أريهان... لا شيء بعدها كما كان', () => go('pretender'));
+        }
+      },
+      {
+        emoji: '🌑', text: 'أعزله بهدوء وأُبعده عن القصر بلا ضجة — المملكة لا تتحمل فضيحة',
+        sub: [{ label: '+النبلاء +10', type: 'up' }, { label: '−الشعب −5', type: 'down' }, { label: '+استقرار', type: 'neutral' }],
+        fn: () => {
+          apply({nobles:10, people:-5, army:5});
+          G.tags.add('silent_exile');
+          chronicle('🌑', 'أبعد سليمان بصمت بعيداً عن الأضواء');
+          transition('🌙', 'سليمان غادر... لكن أسراره بقيت', () => go('pretender'));
+        }
+      },
+      {
+        emoji: '🤝', text: 'أستدعيه وحده وأمنحه فرصة للاعتراف مقابل الرحمة',
+        sub: [{ label: '+معلومات نادرة', type: 'neutral' }, { label: '+الكنيسة +5', type: 'up' }, { label: 'خطر: قد يكذب', type: 'neutral' }],
+        fn: () => {
+          const bonus = G.tags.has('church_debt') ? 10 : 5;
+          apply({church: bonus, people:5, nobles:5});
+          G.tags.add('forgave_solomon');
+          G.tags.add('solomon_secret'); // سليمان يكشف سراً مهماً
+          chronicle('🤝', 'منح سليمان فرصة الاعتراف والرحمة');
+          transition('🕯️', 'سليمان بكى... واعترف بأكثر مما توقعت', () => go('pretender'));
+        }
+      },
+    ]
+  },
+
+  // ── SCENE 7: The Pretender ──
+  pretender: {
+    chapter: 'الفصل السابع — دم الملوك',
+    title: 'المدّعي بالعرش',
+    emoji: '👑',
+    mood: 'radial-gradient(ellipse at 50% 120%, rgba(60,40,10,0.7) 0%, transparent 60%)',
+    text: () => {
+      const base = `
+        من بلاد الشرق البعيدة يصل شاب يدّعي أنه <span class="dramatic">ابن أبيك من زواج سري</span>.
+        معه وثائق تبدو حقيقية، وخاتم ملكي قديم.
+        الشعب يتساءل. النبلاء يتآمرون. والجيش ينتظر.
+        <br><br>
+        <span class="char-name">ليلى</span> تجلس أمامك وعيناها قلقتان:
+        <span class="whisper">"جلالتك، إن كان حقيقياً — فنصف المملكة ستتبعه. وإن كان كاذباً — فمن أرسله؟"</span>
+        <br><br>
+      `;
+      if (G.tags.has('solomon_secret')) return base + `<span class="good-word">سليمان اعترف:</span> هذا الشاب حقيقي — أبوك أخبره بهذا السر قبل موته. <span class="dramatic">أخوك غير الشرعي حيّ.</span>`;
+      if (G.tags.has('public_trial')) return base + `بعد محاكمة سليمان العلنية، <span class="dramatic">الناس يصدّقون أي ادعاء</span> يزعزع العرش الحالي.`;
+      if (G.tags.has('crushed_rebel')) return base + `جيشك القوي يقف خلفك — لكن <span class="whisper">القوة وحدها لا تُسكت الشك.</span>`;
+      return base + `الحقيقة مدفونة... وعليك أن تقرر كيف تتعامل مع هذا اللغز.`;
+    },
+    memory: () => {
+      if (G.tags.has('solomon_secret')) return '💀 سليمان كشف: المدّعي أخوك فعلاً';
+      if (G.tags.has('public_trial')) return '⚖️ محاكمة سليمان زرعت الشك في القلوب';
+      return '👑 من أرسل هذا الشاب... ولماذا الآن؟';
+    },
+    choices: [
+      {
+        emoji: '🧬', text: 'أجرّب اختبار الدم أمام الأسقف وكبار النبلاء — الحق يعلو',
+        sub: [{ label: '+الكنيسة +15', type: 'up' }, { label: '+الشعب +10', type: 'up' }, { label: 'الحقيقة ستُكشف', type: 'neutral' }],
+        fn: () => {
+          const isReal = G.tags.has('solomon_secret');
+          if (isReal) {
+            apply({people:10, church:15, nobles:-10});
+            G.tags.add('brother_revealed');
+            chronicle('🧬', 'كشف اختبار الدم: المدّعي أخ حقيقي');
+            transition('😱', 'الصدمة تسري في القصر... أخوك حيّ!', () => go('legacy'));
+          } else {
+            apply({people:10, church:15, nobles:10});
+            G.tags.add('pretender_exposed');
+            chronicle('🧬', 'فضح المدّعي الكاذب أمام الجميع');
+            transition('🎯', 'المحتال انكشف! العرش لك وحدك!', () => go('legacy'));
+          }
+        }
+      },
+      {
+        emoji: '⚔️', text: 'أعتقله فوراً — من يشكّك في شرعية الملك يستحق الزنزانة',
+        sub: [{ label: '+الجيش +10', type: 'up' }, { label: '−الشعب −20', type: 'down' }, { label: '−الكنيسة −10', type: 'down' }],
+        fn: () => {
+          apply({army:10, people:-20, church:-10});
+          G.tags.add('imprisoned_pretender');
+          chronicle('⚔️', 'سجن المدّعي دون محاكمة');
+          transition('🔒', 'الجدران تبتلعه... لكن الشائعات تبقى', () => go('legacy'));
+        }
+      },
+      {
+        emoji: '🕊️', text: 'أعترف به أخاً وأمنحه لقباً شرفياً بلا صلاحيات — أقرب العدو',
+        sub: [{ label: '+الشعب +20', type: 'up' }, { label: '+الكنيسة +10', type: 'up' }, { label: '−النبلاء −5', type: 'down' }],
+        fn: () => {
+          apply({people:20, church:10, nobles:-5, army:5});
+          G.tags.add('adopted_brother');
+          chronicle('🕊️', 'اعترف بالمدّعي أخاً وأعطاه لقباً شرفياً');
+          transition('👑', 'الشعب يُحب الرحمة... والأخ يبتسم بعيون باردة', () => go('legacy'));
+        }
+      },
+    ]
+  },
+
+  // ── SCENE 8: Legacy ──
+  legacy: {
+    chapter: 'الفصل الثامن — إرث أريهان',
+    title: 'القرار الأخير',
+    emoji: '🌅',
+    mood: 'radial-gradient(ellipse at 50% 120%, rgba(100,70,20,0.6) 0%, transparent 60%)',
+    text: () => {
+      const base = `
+        عشر سنوات مرّت على جلوسك على عرش أريهان.
+        المملكة تغيّرت. أنت تغيّرت. والآن أمامك قرار واحد أخير — سيُحدد كيف تُذكر.
+        <br><br>
+        <span class="char-name">ليلى الحكيمة</span> تقف بجانبك للمرة الأخيرة:
+        <span class="whisper">"جلالتك، كل ملك يترك شيئاً. ماذا تريد أن تترك أريهان؟"</span>
+        <br><br>
+      `;
+      if (G.tags.has('brother_revealed') || G.tags.has('adopted_brother'))
+        return base + `<span class="char-name">أخوك</span> يقف في الزاوية يراقب. عيناه لا تكشفان عن نواياه.`;
+      if (G.tags.has('healed_all'))
+        return base + `الشعب الذي عالجت جراحه لا يزال يهتف باسمك في الأسواق.`;
+      if (G.tags.has('led_battle'))
+        return base + `الجنود الذين قاتلت معهم صاروا آباء وأمهات — ويُحكون لأطفالهم عن ملكهم.`;
+      return base + `أريهان تنتظر. التاريخ يُعدّ قلمه.`;
+    },
+    memory: () => {
+      if (G.tags.has('adopted_brother') || G.tags.has('brother_revealed')) return '👑 أخوك لا يزال في القصر... يراقب';
+      if (G.tags.has('forgave_solomon')) return '🕯️ رحمتك بسليمان علّمت الناس معنى العدل';
+      return '📜 عشر سنوات من القرارات تقودك لهذه اللحظة';
+    },
+    choices: [
+      {
+        emoji: '📜', text: 'أُصدر ميثاق الحقوق — أول قانون يحمي عامة الشعب من ظلم النبلاء',
+        sub: [{ label: '+الشعب +30', type: 'up' }, { label: '−النبلاء −25', type: 'down' }, { label: '+إرث تاريخي', type: 'neutral' }],
+        fn: () => {
+          apply({people:30, nobles:-25, church:10});
+          G.tags.add('charter_issued');
+          chronicle('📜', 'أصدر ميثاق الحقوق لحماية الشعب');
+          transition('📜', 'الميثاق يُقرأ في كل قرية... اسمك يُنقش في التاريخ', calcEnding);
+        }
+      },
+      {
+        emoji: '🏰', text: 'أبني الجامعة الكبرى وأُدخل العلم والطب لكل أبناء أريهان',
+        sub: [{ label: '+الشعب +20', type: 'up' }, { label: '+الكنيسة +10', type: 'up' }, { label: '+النبلاء +10', type: 'up' }],
+        fn: () => {
+          apply({people:20, church:10, nobles:10, army:5});
+          G.tags.add('university_built');
+          chronicle('🏰', 'أسّس الجامعة الكبرى لأبناء أريهان');
+          transition('🎓', 'النور يُضاء... والجهل يتراجع', calcEnding);
+        }
+      },
+      {
+        emoji: '⚔️', text: 'أُعلن أريهان إمبراطورية وأبدأ توسعاً نحو الشمال — الثندار ستدفع',
+        sub: [{ label: '+الجيش +30', type: 'up' }, { label: '+النبلاء +15', type: 'up' }, { label: '−الشعب −20', type: 'down' }],
+        fn: () => {
+          apply({army:30, nobles:15, people:-20, church:-5});
+          G.tags.add('empire_declared');
+          chronicle('⚔️', 'أعلن أريهان إمبراطورية وبدأ التوسع');
+          transition('🔥', 'الراية ترتفع... والحرب تبدأ من جديد', calcEnding);
+        }
+      },
+    ]
+  },
+};
+
+// ═══════════════════════════════════════════
+// RANDOM EVENTS SYSTEM
+// ═══════════════════════════════════════════
+const RANDOM_EVENTS = [
+  {
+    id: 'spy_caught',
+    weight: 3,
+    emoji: '🕵️',
+    title: 'جاسوس في القصر',
+    text: 'حرّاسك يُمسكون بجاسوس يُصوّر خرائط القصر. عند استجوابه، يكشف أنه يعمل لصالح النبلاء الشماليين.',
+    choices: [
+      { text: 'اعدمه فوراً رسالةً للآخرين', emoji: '⚔️', apply: {army:5, people:-5}, tag: null },
+      { text: 'استخدمه عميلاً مزدوجاً', emoji: '🎭', apply: {nobles:5, church:5}, tag: 'double_agent' },
+    ]
+  },
+  {
+    id: 'harvest_miracle',
+    weight: 2,
+    emoji: '🌾',
+    title: 'موسم وفير',
+    text: 'خلافاً للتوقعات، جاء الحصاد هذا العام وفيراً. الفلاحون يقولون إنه بركة من الله على حكمك.',
+    choices: [
+      { text: 'وزّع الفائض على الفقراء', emoji: '🏘️', apply: {people:15, nobles:-5}, tag: 'distributed_harvest' },
+      { text: 'ادّخره في الخزينة للطوارئ', emoji: '💰', apply: {nobles:10, army:5}, tag: null },
+    ]
+  },
+  {
+    id: 'leyla_arrives',
+    weight: 4,
+    emoji: '🌙',
+    title: 'المستشارة الغريبة',
+    text: 'امرأة تدعى <strong>ليلى الحكيمة</strong> تطلب مقابلتك. يُقال إنها درست في أكاديميات الشرق وتُحسن سبع لغات. عيناها تقرآن الغرف قبل الناس.',
+    choices: [
+      { text: 'اقبلها مستشارةً بلا صلاحيات رسمية', emoji: '🌙', apply: {church:-5, people:5}, tag: 'leyla_trusted' },
+      { text: 'ارفض — القصر ليس مكاناً للغرباء', emoji: '🚪', apply: {army:5}, tag: null },
+    ]
+  },
+  {
+    id: 'merchants_petition',
+    weight: 3,
+    emoji: '💼',
+    title: 'وفد التجار',
+    text: 'عشرون تاجراً من المدن الكبرى يطالبون بإلغاء ضريبة الطرق. يقولون إنها تُفقر الاقتصاد. النبلاء يعارضون — هذه الضريبة تملأ جيوبهم.',
+    choices: [
+      { text: 'ألغِ الضريبة — التجارة تُغني الجميع', emoji: '🛒', apply: {people:10, nobles:-15}, tag: 'trade_freed' },
+      { text: 'خفّضها إلى النصف — حلّ وسط', emoji: '⚖️', apply: {people:5, nobles:-5}, tag: null },
+    ]
+  },
+  {
+    id: 'army_promotion',
+    weight: 2,
+    emoji: '🎖️',
+    title: 'بطل المعركة',
+    text: 'ضابط شاب من عائلة فقيرة أنقذ كتيبة كاملة خلال الغزو. طارق بن خالد يقترح ترقيته لقائد الحرس الملكي. النبلاء يرفضون — العائلة ليست نبيلة.',
+    choices: [
+      { text: 'رقّه — الكفاءة فوق النسب', emoji: '⭐', apply: {army:20, nobles:-10}, tag: 'merit_promotion' },
+      { text: 'امنحه ميدالية فقط — التقاليد مهمة', emoji: '🏅', apply: {army:5, nobles:5}, tag: null },
+    ]
+  },
+  {
+    id: 'drought_echo',
+    weight: 2,
+    emoji: '💧',
+    title: 'نبع جديد',
+    text: 'مهندسون يكتشفون نبعاً ضخماً تحت الصحراء الجنوبية. الحفر مُكلف لكن إن نجح، لن تعاني أريهان من العطش مجدداً.',
+    choices: [
+      { text: 'أموّل الحفر من خزينة الدولة', emoji: '⛏️', apply: {people:15, nobles:5}, tag: 'spring_funded' },
+      { text: 'اتركه للقطاع الخاص', emoji: '💎', apply: {nobles:15, people:-5}, tag: null },
+    ]
+  },
+];
+
+// Show a random event as a modal-style overlay
+function triggerRandomEvent(callback) {
+  // Pick a weighted random event not yet seen
+  const unseen = RANDOM_EVENTS.filter(e => !G.seenEvents.has(e.id));
+  if (unseen.length === 0) { callback(); return; }
+
+  const totalWeight = unseen.reduce((s,e) => s + e.weight, 0);
+  let rand = Math.random() * totalWeight;
+  let chosen = unseen[0];
+  for (const e of unseen) {
+    rand -= e.weight;
+    if (rand <= 0) { chosen = e; break; }
+  }
+  G.seenEvents.add(chosen.id);
+
+  showRandomEventModal(chosen, callback);
+}
+
+function showRandomEventModal(ev, callback) {
+  // Create modal
+  const modal = document.createElement('div');
+  modal.style.cssText = `
+    position:fixed;inset:0;z-index:200;background:rgba(8,6,4,0.97);
+    display:flex;align-items:center;justify-content:center;padding:24px;
+    animation:fadeIn 0.3s ease;
+  `;
+  modal.innerHTML = `
+    <div style="max-width:420px;width:100%;text-align:center;">
+      <div style="font-size:56px;margin-bottom:12px;filter:drop-shadow(0 0 20px rgba(212,168,67,0.5))">${ev.emoji}</div>
+      <div style="font-size:10px;letter-spacing:4px;color:#8b6914;margin-bottom:8px">— حدث طارئ —</div>
+      <div style="font-family:'Amiri',serif;font-size:24px;font-weight:700;color:#f0c96a;margin-bottom:16px">${ev.title}</div>
+      <div style="font-family:'Amiri',serif;font-size:16px;line-height:2;color:#ddc99a;margin-bottom:24px">${ev.text}</div>
+      <div style="display:flex;flex-direction:column;gap:10px" id="eventChoices"></div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+
+  const choicesEl = modal.querySelector('#eventChoices');
+  ev.choices.forEach(c => {
+    const btn = document.createElement('button');
+    btn.style.cssText = `
+      background:rgba(212,168,67,0.07);border:1px solid rgba(212,168,67,0.25);
+      border-radius:12px;padding:13px 16px;width:100%;cursor:pointer;
+      color:#e8d5a3;font-family:'Scheherazade New',serif;font-size:15px;
+      display:flex;align-items:center;gap:10px;text-align:right;
+      transition:all 0.2s;
+    `;
+    btn.innerHTML = `<span style="font-size:22px">${c.emoji}</span><span>${c.text}</span>`;
+    btn.onclick = () => {
+      apply(c.apply);
+      if (c.tag) G.tags.add(c.tag);
+      modal.style.opacity = '0';
+      modal.style.transition = 'opacity 0.3s';
+      setTimeout(() => { modal.remove(); callback(); }, 300);
+    };
+    choicesEl.appendChild(btn);
+  });
+}
+
+
+const REACTIONS = {
+  people: {
+    up: ['الشعب يهتف باسمك!', 'القلوب معك أيها الملك!', 'رضا الشعب يقوّي العرش'],
+    down: ['الشعب يتذمر في الأزقة...', 'الغضب يتصاعد في الشوارع', 'الشعب يفقد ثقته...']
+  },
+  army: {
+    up: ['الجنود يرفعون سيوفهم!', 'الجيش أكثر ولاءً!', 'المورال العسكري يرتفع!'],
+    down: ['الجنود يتذمرون...', 'الجيش يفقد حماسه', 'التذمر ينتشر في الثكنات...']
+  },
+  nobles: {
+    up: ['النبلاء راضون عنك', 'الثروة تتدفق لصالحك', 'أصحاب النفوذ معك'],
+    down: ['النبلاء يتآمرون خلف الستار...', 'الثروة تنأى عنك', 'غضب النبلاء خطير...']
+  },
+  church: {
+    up: ['الكنيسة تباركك!', 'الشرعية الدينية تتعزز', 'الأسقف يرضى عنك'],
+    down: ['الكنيسة تنأى عنك...', 'الشرعية الدينية تتزعزع', 'رجال الدين يتساءلون...']
+  }
+};
+
+let toastTimer = null;
+
+function showReaction(msg) {
+  const toast = document.getElementById('reactionToast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  if(toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('show'), 2000);
+}
+
+function apply(delta) {
+  const reactions = [];
+  ['people','army','nobles','church'].forEach(f => {
+    if(delta[f] !== undefined && delta[f] !== 0) {
+      const prev = G[f];
+      G[f] = clamp(G[f] + delta[f]);
+      const numEl = document.getElementById('num-'+f);
+      numEl.classList.remove('flash-up','flash-down');
+      void numEl.offsetWidth; // force reflow
+      if(delta[f] > 0) {
+        numEl.classList.add('flash-up');
+        const msgs = REACTIONS[f]?.up;
+        if(msgs) reactions.push(msgs[Math.floor(Math.random()*msgs.length)]);
+      } else {
+        numEl.classList.add('flash-down');
+        const msgs = REACTIONS[f]?.down;
+        if(msgs) reactions.push(msgs[Math.floor(Math.random()*msgs.length)]);
+      }
+    }
+  });
+  updateBars();
+  // Show the most impactful reaction
+  if(reactions.length > 0) {
+    setTimeout(() => showReaction(reactions[0]), 400);
+  }
+}
+
+function clamp(v) { return Math.max(0, Math.min(100, v)); }
+
+function updateBars() {
+  ['people','army','nobles','church'].forEach(f => {
+    const v = G[f];
+    const barEl = document.getElementById('bar-'+f);
+    const numEl = document.getElementById('num-'+f);
+    barEl.style.width = v + '%';
+    numEl.textContent = v;
+    numEl.style.color = v <= 20 ? '#e88888' : v >= 75 ? '#88e8a8' : '';
+    // Critical glow on bar background
+    const bgEl = barEl.parentElement;
+    if(v <= 25) {
+      bgEl.style.boxShadow = '0 0 6px rgba(201,76,76,0.4)';
+      bgEl.style.borderRadius = '2px';
+    } else {
+      bgEl.style.boxShadow = '';
+    }
+  });
+}
+
+function go(sceneId) {
+  G.turn++;
+  showScene(SCENES[sceneId]);
+}
+
+function chronicle(icon, text) {
+  G.choices.push({ icon, text });
+}
+
+function showScene(sc) {
+  // Scroll to top
+  document.getElementById('sceneContainer').scrollTo({top:0,behavior:'smooth'});
+
+  // Visual
+  document.getElementById('sceneEmoji').textContent = sc.emoji;
+  document.getElementById('moodOverlay').style.background = sc.mood;
+
+  // Chapter / title
+  document.getElementById('chapterTag').textContent = sc.chapter;
+  document.getElementById('sceneTitle').textContent = sc.title;
+  document.getElementById('chapterIndicator').textContent = 'الفصل ' + arabNum(G.turn);
+
+  // Body text
+  const bodyText = typeof sc.text === 'function' ? sc.text() : sc.text;
+  document.getElementById('sceneBody').innerHTML = bodyText;
+
+  // Memory
+  const memFn = sc.memory;
+  let memVal = null;
+  if (typeof memFn === 'function') memVal = memFn();
+  else if (memFn) memVal = memFn;
+  const memTag = document.getElementById('memoryTag');
+  if(memVal) {
+    memTag.style.display = 'inline-flex';
+    document.getElementById('memoryText').textContent = memVal;
+    // Re-trigger animation
+    memTag.classList.remove('pop-anim');
+    void memTag.offsetWidth;
+    memTag.classList.add('pop-anim');
+  } else {
+    memTag.style.display = 'none';
+  }
+
+  // Choices
+  const list = document.getElementById('choicesList');
+  list.innerHTML = '';
+  sc.choices.forEach(c => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+
+    const pills = c.sub.map(s => `<span class="effect-pill effect-${s.type}">${s.label}</span>`).join('');
+
+    btn.innerHTML = `
+      <span class="choice-emoji">${c.emoji}</span>
+      <div class="choice-content">
+        <div class="choice-text">${c.text}</div>
+        <div class="choice-effects">${pills}</div>
+      </div>
+    `;
+
+    btn.onclick = () => {
+      list.querySelectorAll('button').forEach(b => { b.disabled = true; b.style.opacity = '0.5'; });
+      btn.style.opacity = '1';
+      btn.style.borderColor = 'var(--gold)';
+      setTimeout(c.fn, 300);
+    };
+
+    list.appendChild(btn);
+  });
+}
+
+function transition(emoji, text, callback) {
+  const overlay = document.getElementById('transOverlay');
+  const content = document.getElementById('transContent');
+  content.innerHTML = `<div style="font-size:48px;margin-bottom:12px">${emoji}</div><div>${text}</div>`;
+  overlay.classList.add('show');
+  setTimeout(() => {
+    overlay.classList.remove('show');
+    setTimeout(callback, 400);
+  }, 1600);
+}
+
+function arabNum(n) {
+  return ['','١','٢','٣','٤','٥','٦','٧','٨'][n] || n;
+}
+
+// ═══════════════════════════════════════════
+// ENDINGS
+// ═══════════════════════════════════════════
+const ENDINGS = [
+  // ── النهاية الأسطورية المطوّلة ──
+  {
+    id: 'legend',
+    condition: () => {
+      const avg = (G.people + G.army + G.nobles + G.church) / 4;
+      return avg >= 58 && G.people >= 55 && G.army >= 55;
+    },
+    icon: '🌟',
+    color: '#d4a843',
+    title: 'الملك الأسطوري',
+    rank: 'مرتبة: أعظم ملوك أريهان على الإطلاق',
+    story: () => {
+      const charter = G.tags.has('charter_issued') ? ' أصدر الميثاق الذي حمى الشعب لقرون.' : '';
+      const uni = G.tags.has('university_built') ? ' وبنى الجامعة التي أضاءت العقول.' : '';
+      return `حكم <strong>${G.name}</strong> بحكمة نادرة.${charter}${uni} الشعب أحبّه، الجيش أطاعه، والتاريخ حفر اسمه بذهب. حين مات، بكى الغني والفقير معاً.`;
+    },
+  },
+  // ── ملك الرحمة ──
+  {
+    id: 'people',
+    condition: () => G.people >= 70 && G.army < 50,
+    icon: '🕊️',
+    color: '#4caf8c',
+    title: 'محبوب الشعب',
+    rank: 'مرتبة: الملك الإنساني',
+    story: () => `لم يكن <strong>${G.name}</strong> أقوى الملوك ولا أغناهم، لكنه كان أكثرهم رحمة. اختار الشعب على القوة، والعدل على الهيبة. حين مات، حمل الفقراء نعشه قبل النبلاء.`,
+  },
+  // ── الملك المحارب ──
+  {
+    id: 'warrior',
+    condition: () => G.army >= 70 && G.tags.has('led_battle'),
+    icon: '⚔️',
+    color: '#c94c4c',
+    title: 'الملك المحارب',
+    rank: 'مرتبة: قاهر الثندار',
+    story: () => {
+      const empire = G.tags.has('empire_declared') ? ' ثم أعلن الإمبراطورية ومدّ الراية إلى ما وراء الجبال.' : '';
+      return `خرج <strong>${G.name}</strong> على رأس جيشه والشعب يهتف.${empire} التاريخ يحفظ انتصاراته — ويتجاهل ما دُمّر خلفها.`;
+    },
+  },
+  // ── ملك الكنيسة ──
+  {
+    id: 'church',
+    condition: () => G.church >= 75 && G.people < 60,
+    icon: '⛪',
+    color: '#6c6caf',
+    title: 'ملك التاج والمذبح',
+    rank: 'مرتبة: أداة الكنيسة',
+    story: () => `حكم <strong>${G.name}</strong>، لكن الأسقف يوحنا هو من أدار المملكة فعلياً. الكنيسة انتصرت، والملك أصبح واجهتها. التاريخ يتذكره ملكاً تقياً... ضعيفاً.`,
+  },
+  // ── نهاية الأخ الخفي ──
+  {
+    id: 'brother_twist',
+    condition: () => G.tags.has('adopted_brother') && G.people >= 60,
+    icon: '👑',
+    color: '#c9a843',
+    title: 'ملكان في قلب واحد',
+    rank: 'مرتبة: الملك الذي أنهى الكراهية',
+    story: () => `قرّر <strong>${G.name}</strong> أن يعترف بأخيه غير الشرعي — لا لأنه مُجبر، بل لأنه آمن أن الرحمة أقوى من الخوف. الأخ الذي كان يمكن أن يكون عدواً، صار درعاً. أريهان حكمها ملكان بروح واحدة.`,
+  },
+  // ── نهاية ليلى السرية ──
+  {
+    id: 'leyla_ending',
+    condition: () => G.tags.has('leyla_trusted') && G.tags.has('forgave_solomon') && G.people >= 65,
+    icon: '🌙',
+    color: '#8c6caf',
+    title: 'في ظل الحكيمة',
+    rank: 'مرتبة: الملك الذي عرف متى يستمع',
+    story: () => `كانت <strong>ليلى</strong> تعرف نهاية كل قصة قبل أن تبدأ. وكان <strong>${G.name}</strong> يعرف متى يستمع. معاً أداروا أريهان بهدوء لم تعرفه المملكة من قبل. التاريخ كتب اسميهما معاً — وهذا لم يزعج أحدهما.`,
+  },
+  // ── السقوط ──
+  {
+    id: 'collapse',
+    condition: () => G.people <= 25 || G.army <= 15,
+    icon: '💀',
+    color: '#8b1a1a',
+    title: 'سقوط أريهان',
+    rank: 'مرتبة: آخر ملوك أريهان',
+    story: () => {
+      const betrayal = G.tags.has('public_trial') ? ' فضيحة سليمان كانت الشرارة.' : '';
+      return `لا يُكتب اسم <strong>${G.name}</strong> إلا مقروناً بكلمة: الكارثة.${betrayal} الشعب ثار، الجيش تفكك، والمملكة تشققت. أريهان... لم تعد أريهان.`;
+    },
+  },
+  // ── الملك المنسي ──
+  {
+    id: 'forgotten',
+    condition: () => true,
+    icon: '📜',
+    color: '#806040',
+    title: 'الملك المنسي',
+    rank: 'مرتبة: ملك عادي في زمن غير عادي',
+    story: () => `حكم <strong>${G.name}</strong> لسنوات. لم يُبدع ولم يُهلك. قرارات متذبذبة، نجاحات متواضعة. التاريخ مرّ عليه كما يمرّ الريح على الرمال — بلا أثر يُذكر.`,
+  },
+];
+
+function calcEnding() {
+  const ending = ENDINGS.find(e => e.condition()) || ENDINGS[ENDINGS.length-1];
+  showEnding(ending);
+}
+
+function showEnding(e) {
+  document.getElementById('endingSeal').textContent = e.icon;
+  document.getElementById('endingTitle').textContent = e.title;
+  document.getElementById('endingTitle').style.color = e.color;
+  document.getElementById('endingRank').textContent = e.rank;
+  document.getElementById('endingStory').innerHTML = e.story();
+  document.getElementById('endingGlow').style.setProperty('--ending-color', e.color);
+  document.getElementById('endingGlow').style.background =
+    `radial-gradient(ellipse 80% 70% at 50% 100%, ${e.color}55 0%, transparent 70%)`;
+
+  // Faction standings
+  const fs = document.getElementById('factionStandings');
+  fs.innerHTML = `<div class="standings-title">⚖️ ميزان الفصائل في نهاية الحكم</div>`;
+  [
+    {icon:'🏘️', name:'الشعب', val: G.people, color:'#4caf8c', cls:'f-people'},
+    {icon:'🗡️', name:'الجيش', val: G.army, color:'#c94c4c', cls:'f-army'},
+    {icon:'💎', name:'النبلاء', val: G.nobles, color:'#8c6caf', cls:'f-nobles'},
+    {icon:'⛪', name:'الكنيسة', val: G.church, color:'#8c8ccf', cls:'f-church'},
+  ].forEach(f => {
+    const row = document.createElement('div');
+    row.className = 'standing-row';
+    row.innerHTML = `
+      <span class="standing-icon">${f.icon}</span>
+      <div class="standing-info">
+        <div class="standing-name">${f.name}</div>
+        <div class="standing-bar-wrap">
+          <div class="standing-bar-fill" style="width:${f.val}%;background:${f.color}"></div>
+        </div>
+      </div>
+      <div class="standing-val" style="color:${f.color}">${f.val}</div>
+    `;
+    fs.appendChild(row);
+  });
+
+  // Chronicle
+  const ch = document.getElementById('chronicle');
+  ch.innerHTML = '';
+  G.choices.forEach((c, i) => {
+    const entry = document.createElement('div');
+    entry.className = 'chronicle-entry';
+    entry.innerHTML = `<span class="chronicle-icon">${c.icon}</span><span>الفصل ${arabNum(i+1)}: ${c.text}</span>`;
+    ch.appendChild(entry);
+  });
+
+  transition('📜', 'النهاية كُتبت...', () => {
+    showScreen('ending');
+  });
+}
+
+function shareResult() {
+  const endingTitle = document.getElementById('endingTitle').textContent;
+  const text = `👑 لعبت أريهان!\nالنتيجة: "${endingTitle}"\n\nشعب: ${G.people} | جيش: ${G.army} | نبلاء: ${G.nobles} | كنيسة: ${G.church}`;
+  if(navigator.share) {
+    navigator.share({ title: 'أريهان', text });
+  } else {
+    navigator.clipboard.writeText(text).then(() => showBanner('📋', 'تم نسخ النتيجة!'));
+  }
+}
+
+// ═══════════════════════════════════════════
+// UI HELPERS
+// ═══════════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById(id);
+  el.classList.add('active');
+  el.scrollTo({top:0});
+}
+
+function showBanner(icon, text) {
+  const b = document.getElementById('conBanner');
+  document.getElementById('conIcon').textContent = icon;
+  document.getElementById('conText').textContent = text;
+  b.classList.add('visible');
+  setTimeout(() => b.classList.remove('visible'), 2500);
+}
+
+// ═══════════════════════════════════════════
+// SPLASH SCREEN
+// ═══════════════════════════════════════════
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    const splash = document.getElementById('splash');
+    splash.classList.add('hidden');
+    setTimeout(() => splash.remove(), 800);
+  }, 2400);
+});
+
+// ═══════════════════════════════════════════
+// START / RESTART
+// ═══════════════════════════════════════════
+function startGame() {
+  const name = document.getElementById('kingInput').value.trim() || 'السلطان';
+  G = {
+    name,
+    people: 60, army: 60, nobles: 60, church: 60,
+    choices: [],
+    tags: new Set(),
+    seenEvents: new Set(),
+    turn: 1,
+  };
+  document.getElementById('kingTitleBar').textContent = 'الملك ' + name;
+  updateBars();
+  showScreen('game');
+  setTimeout(() => {
+    showScene(SCENES['debt']);
+  }, 100);
+}
+
+function restartGame() {
+  showScreen('intro');
+  document.getElementById('kingInput').value = '';
+}
+</script>
+</body>
+</html>
