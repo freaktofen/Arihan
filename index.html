@@ -1557,11 +1557,129 @@ body.mood-peaceful { background: #030508; }
   margin-top: 4px;
 }
 
+/* ══ LANGUAGE SELECT SCREEN ══ */
+#langSelect {
+  position: fixed; inset: 0; z-index: 9999;
+  background: var(--dark);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 36px;
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+#langSelect.hidden {
+  opacity: 0; transform: scale(1.05); pointer-events: none;
+}
+.ls-crown { font-size: 52px; filter: drop-shadow(0 0 28px rgba(212,168,67,0.9)); }
+.ls-name {
+  font-family: 'Amiri', serif; font-size: 52px; font-weight: 700;
+  letter-spacing: 6px; line-height: 1; text-align: center;
+  background: linear-gradient(180deg, var(--gold4) 0%, var(--gold) 45%, var(--gold3) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.ls-sub {
+  font-size: 9px; letter-spacing: 5px; color: var(--text3);
+  margin-top: 6px; font-family: 'Georgia', serif; text-align: center;
+}
+.ls-divider {
+  display: flex; align-items: center; gap: 14px; width: 220px;
+}
+.ls-divider-line {
+  flex: 1; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(212,168,67,0.25));
+}
+.ls-divider-line:first-child { background: linear-gradient(270deg, transparent, rgba(212,168,67,0.25)); }
+.ls-divider-gem { color: var(--gold3); font-size: 9px; }
+.ls-prompt { font-size: 10px; letter-spacing: 4px; color: var(--text3); font-family: 'Georgia', serif; }
+.ls-buttons { display: flex; gap: 16px; }
+.ls-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  padding: 22px 32px; background: rgba(212,168,67,0.04);
+  border: 1px solid rgba(212,168,67,0.2); border-radius: 20px;
+  cursor: pointer; transition: all 0.3s ease; min-width: 120px;
+  position: relative; overflow: hidden;
+}
+.ls-btn::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(212,168,67,0.1), transparent 60%);
+  opacity: 0; transition: opacity 0.3s;
+}
+.ls-btn:hover { border-color: rgba(212,168,67,0.55); background: rgba(212,168,67,0.08); }
+.ls-btn:hover::before { opacity: 1; }
+.ls-btn:active { transform: scale(0.96); }
+.ls-btn-flag { font-size: 30px; line-height: 1; }
+.ls-btn-lang { font-size: 18px; font-weight: 700; color: var(--gold2); letter-spacing: 2px; }
+.ls-btn-ar .ls-btn-lang { font-family: 'Amiri', serif; font-size: 22px; }
+.ls-btn-en .ls-btn-lang { font-family: 'Georgia', serif; }
+.ls-btn-hint { font-size: 9px; color: var(--text3); letter-spacing: 1px; }
+.ls-btn-ar .ls-btn-hint { font-family: 'Amiri', serif; font-size: 11px; }
+.ls-footer { font-size: 9px; letter-spacing: 2px; color: rgba(100,90,70,0.4); font-family: 'Georgia', serif; }
+@keyframes lsItemIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+#langSelect .ls-crown  { animation: lsItemIn 0.6s ease 0.15s both, crownFloat 4s ease-in-out 0.75s infinite; }
+#langSelect .ls-title  { animation: lsItemIn 0.6s ease 0.28s both; }
+#langSelect .ls-divider{ animation: lsItemIn 0.5s ease 0.40s both; }
+#langSelect .ls-prompt { animation: lsItemIn 0.5s ease 0.50s both; }
+#langSelect .ls-buttons{ animation: lsItemIn 0.6s ease 0.60s both; }
+#langSelect .ls-footer { animation: lsItemIn 0.5s ease 0.78s both; }
+
 </style>
 </head>
 <body>
 
+<!-- Language Selection Screen -->
+<div id="langSelect">
+  <span class="ls-crown">👑</span>
+  <div class="ls-title">
+    <div class="ls-name">أريهان</div>
+    <div class="ls-sub">ARIHAN — KINGDOM OF FATE</div>
+  </div>
+  <div class="ls-divider">
+    <div class="ls-divider-line"></div>
+    <span class="ls-divider-gem">✦</span>
+    <span class="ls-divider-gem">◆</span>
+    <span class="ls-divider-gem">✦</span>
+    <div class="ls-divider-line"></div>
+  </div>
+  <div class="ls-prompt">SELECT LANGUAGE · اختر اللغة</div>
+  <div class="ls-buttons">
+    <button class="ls-btn ls-btn-ar" onclick="chooseLang('ar')">
+      <span class="ls-btn-flag">🌙</span>
+      <span class="ls-btn-lang">عربي</span>
+      <span class="ls-btn-hint">Arabic</span>
+    </button>
+    <button class="ls-btn ls-btn-en" onclick="chooseLang('en')">
+      <span class="ls-btn-flag">⚔️</span>
+      <span class="ls-btn-lang">English</span>
+      <span class="ls-btn-hint">الإنجليزية</span>
+    </button>
+  </div>
+  <div class="ls-footer">ARIHAN · مملكة القرار والمصير</div>
+</div>
+
 <canvas id="bgCanvas"></canvas>
+
+<!-- Language Toggle -->
+<div id="langToggle" style="
+  position:fixed; top:12px; left:12px; z-index:1000;
+  display:flex; background:rgba(5,4,3,0.88);
+  border:1px solid rgba(212,168,67,0.3); border-radius:22px;
+  overflow:hidden; backdrop-filter:blur(12px);
+  box-shadow:0 2px 14px rgba(0,0,0,0.5);
+">
+  <button id="btnAr" onclick="setLang('ar')" style="
+    padding:6px 14px; font-size:12px; letter-spacing:1px;
+    font-family:'Amiri',serif; color:#d4a843;
+    background:rgba(212,168,67,0.15); border:none; cursor:pointer;
+    transition:all 0.2s; border-radius:22px 0 0 22px;
+  ">ع</button>
+  <button id="btnEn" onclick="setLang('en')" style="
+    padding:6px 14px; font-size:11px; letter-spacing:2px;
+    font-family:'Georgia',serif; color:#a08860;
+    background:transparent; border:none; cursor:pointer;
+    transition:all 0.2s; border-radius:0 22px 22px 0;
+  ">EN</button>
+</div>
 
 <!-- Overlays -->
 <div class="transition-overlay" id="transOverlay">
@@ -2304,7 +2422,7 @@ const SCENES = {
     choices: [
       {
         emoji: '💎', text: 'اعرض على جابر امتيازات تجارية مقابل قرض طارئ',
-        sub: [{ label: '+الخزينة', type: 'up' }, { label: '+النبلاء +10', type: 'up' }, { label: '−الشعب −8', type: 'down' }],
+        sub: [{ label: '+Treasury', type: 'up' }, { label: '+النبلاء +10', type: 'up' }, { label: '−الشعب −8', type: 'down' }],
         fn: () => {
           apply({nobles:10, people:-8, army:5});
           G.tags.add('yusuf_deal');
@@ -2314,7 +2432,7 @@ const SCENES = {
       },
       {
         emoji: '📜', text: 'افرض ضريبة استثنائية على كبار النبلاء والتجار',
-        sub: [{ label: '+الشعب +12', type: 'up' }, { label: '−النبلاء −22', type: 'down' }, { label: '+الخزينة', type: 'up' }],
+        sub: [{ label: '+الشعب +12', type: 'up' }, { label: '−النبلاء −22', type: 'down' }, { label: '+Treasury', type: 'up' }],
         fn: () => {
           apply({people:12, nobles:-22, church:5});
           G.tags.add('emergency_tax');
@@ -4040,6 +4158,1452 @@ window.showEnding = function(e) {
 
 // Init on load
 checkNGPlusUnlock();
+
+// ══════════════════════════════════════════════════════════════
+// ██████╗ ██╗██╗      █████╗ ███╗   ██╗ ██████╗ ██╗   ██╗ █████╗ ██╗
+// ██╔══██╗██║██║     ██╔══██╗████╗  ██║██╔════╝ ██║   ██║██╔══██╗██║
+// ██████╔╝██║██║     ███████║██╔██╗ ██║██║  ███╗██║   ██║███████║██║
+// ██╔══██╗██║██║     ██╔══██║██║╚██╗██║██║   ██║██║   ██║██╔══██║██║
+// ██████╔╝██║███████╗██║  ██║██║ ╚████║╚██████╔╝╚██████╔╝██║  ██║███████╗
+// ╚═════╝ ╚═╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝ ╚═════╝  ╚═════╝ ╚═╝  ╚═╝╚══════╝
+// COMPLETE BILINGUAL SYSTEM — AR / EN
+// Characters: Marwan | Jasper the Merchant | Leyla | Nasr | Ivan
+// ══════════════════════════════════════════════════════════════
+
+let currentLang = 'ar';
+try { currentLang = localStorage.getItem('arihan_lang') || 'ar'; } catch(e){}
+
+// ── Character name localizer ──────────────────────────────────
+function localizeNames(html) {
+  if (currentLang === 'ar') return html;
+  return html
+    .replace(/الأمير إيفان دراكوف/g, 'Prince Ivan Drakoff')
+    .replace(/الأمير إيفان/g, 'Prince Ivan')
+    .replace(/مروان الداهية/g, 'Marwan')
+    .replace(/جابر الثري/g, 'Jasper')
+    .replace(/ليلى الحكيمة/g, 'Leyla')
+    .replace(/نصر الكاتم/g, 'Nasr')
+    .replace(/إيفان/g, 'Ivan')
+    .replace(/مروان/g, 'Marwan')
+    .replace(/جابر/g, 'Jasper')
+    .replace(/ليلى/g, 'Leyla')
+    .replace(/نصر/g, 'Nasr')
+    .replace(/طارق بن خالد/g, 'General Tariq')
+    .replace(/طارق/g, 'Tariq')
+    .replace(/زيد الوقور/g, 'Elder Zaid')
+    .replace(/زيد/g, 'Zaid')
+    .replace(/كاراز الطبيب/g, 'Karaz the Physician')
+    .replace(/كاراز/g, 'Karaz')
+    .replace(/الحكيم راشد/g, 'Elder Rashid')
+    .replace(/الجنرال ثورفين/g, 'General Thorvinn')
+    .replace(/مملكة الثندار الشمالية/g, 'the Kingdom of Thandar')
+    .replace(/الثندار الشمالية/g, 'Northern Thandar')
+    .replace(/الثندار/g, 'Thandar')
+    .replace(/أريهان/g, 'Arihan');
+}
+
+// ── Sub-label translator ──────────────────────────────────────
+function translateSub(lbl) {
+  if (currentLang === 'ar') return lbl;
+  return lbl
+    .replace(/\+الشعب/g,'+People').replace(/[−-]الشعب/g,'−People')
+    .replace(/\+الجيش/g,'+Army').replace(/[−-]الجيش/g,'−Army')
+    .replace(/\+النبلاء/g,'+Nobles').replace(/[−-]النبلاء/g,'−Nobles')
+    .replace(/\+الحكماء/g,'+Scholars').replace(/[−-]الحكماء/g,'−Scholars')
+    .replace(/[−-]خزينة كبير/g,'−Treasury (large)').replace(/\+خزينة كبير/g,'+Treasury (large)')
+    .replace(/[−-]خزينة/g,'−Treasury').replace(/\+خزينة/g,'+Treasury')
+    .replace(/\+Treasury/g,'+Treasury')
+    .replace(/[−-]مخزون/g,'−Grain stocks').replace(/\+مخزون/g,'+Grain stocks')
+    .replace(/خطر شخصي على الملك/g,'Risk to the ruler personally')
+    .replace(/خطر شخصي على الملكة/g,'Risk to the ruler personally')
+    .replace(/خطر: وعد ثقيل/g,'Risk: a heavy promise')
+    .replace(/[−-]استقلالية الحكم/g,'−Ruler independence')
+    .replace(/تكشف سر مروان مبكراً/g,"Reveals Marwan's secret early")
+    .replace(/تبقى في الظلام/g,'You remain in the dark')
+    .replace(/ورقة ضغط محفوظة/g,'A card held in reserve')
+    .replace(/تفتح مسار ليلى الكامل/g,"Opens Leyla's full storyline")
+    .replace(/ليلى تحترم حزمك/g,"Leyla respects your resolve")
+    .replace(/ليلى تختفي من المشهد/g,'Leyla disappears from the story')
+    .replace(/وقت إضافي للتحضير/g,'Extra preparation time')
+    .replace(/\+سلام شمالي/g,'+Northern peace')
+    .replace(/الحق سيُكشف/g,'Truth will be revealed')
+    .replace(/نتيجة غير مضمونة/g,'Outcome uncertain')
+    .replace(/\+معلومات نادرة/g,'+Rare intelligence')
+    .replace(/[−-]سلطة الملك/g,"−Ruler's authority")
+    .replace(/\+إرث تاريخي/g,'+Historical legacy')
+    .replace(/[−-]ممتلكات ملكية/g,'−Royal properties')
+    .replace(/الشك يسري/g,'suspicion spreads')
+    .replace(/حزم/g,'resolve')
+    .replace(/[−-]النبلاء/g,'−Nobles')
+    .replace(/تفتح مسار/g,'Unlocks path');
+}
+
+// ── Transition text map ───────────────────────────────────────
+const TRANS_EN = {
+  'النبلاء يتذمرون... لكن الخزينة أخذت نفَسها':  'The nobles grumble… but the treasury catches its breath',
+  'الجند يتذمرون... الوعد ثقيل':                  'The soldiers complain… the promise weighs heavy',
+  'الحكيم يبتسم... للعلماء الآن ثمنهم':           'The Scholar smiles… the learned now have their price',
+  'الشعب يهتف باسمك في كل شارع!':                 'The people cheer your name in every street!',
+  'الماء يتدفق... والأرض تعود للحياة':             'Water flows… and the land returns to life',
+  'الحبوب وصلت... لكن الخزينة نزفت':              'The grain arrived… but the treasury bled',
+  'المدينة الشرقية سقطت... الدم يستوجب الدم':     'The eastern city has fallen… blood demands blood',
+  'الأمير قبل... النبلاء الآخرون يتساءلون':        'The Prince accepted… the other nobles wonder',
+  'الشعب يحكم... والتاريخ يراقب':                  'The people judge… and history watches',
+  'غرفة الحرب قررت... الخطة بدأت':                'The war room has decided… the plan is in motion',
+  'المبعوث يتحرك... والثندار تتوقف مؤقتاً':        'The envoy moves… Thandar pauses temporarily',
+  'الذهب يشتري الوقت... الجيش يتحشد':             'Gold buys time… the army musters',
+  'الملك يقاتل! معنويات الجند تحلّق عالياً!':     'The King fights! Troop morale soars!',
+  'الملكة تقاتل! معنويات الجند تحلّق عالياً!':    'The Queen fights! Troop morale soars!',
+  'السلام جاء... بثمن يجرح الكبرياء':             'Peace came… at a price that wounds pride',
+  'الغزاة تراجعوا... القرى الحدودية دُمّرت':      'The invaders retreated… the border villages were destroyed',
+  'الوباء يتراجع... لكن جرح المدينة عميق':        'The plague retreats… but the city\'s wound runs deep',
+  'لا أحد مات وحيداً... هذا لن يُنسى':           'No one died alone… that will never be forgotten',
+  'الحكماء يُديرون شؤون المدينة... والملك يراقب': 'The Scholars manage city affairs… the ruler watches',
+  'الذهب يتدفق... لكن جابر أصبح شريكاً لا تاجراً': 'Gold flows… but Jasper is now a partner, not a merchant',
+  'النبلاء يغلون غضباً... لكن الدولة تتنفس':     'The nobles seethe… but the state breathes again',
+  'الشعب صُدم... ثم بكى. الملك يضحي بنفسه':      'The people were shocked… then wept. The King sacrifices',
+  'الشعب صُدم... ثم بكى. الملكة تضحي بنفسها':    'The people were shocked… then wept. The Queen sacrifices',
+  'المحاكمة تهزّ أريهان... لا شيء بعدها كما كان': 'The trial shakes Arihan… nothing after it is the same',
+  'مروان غادر... لكن أسراره بقيت في الجدران':     'Marwan left… but his secrets remained in the walls',
+  'مروان بكى... واعترف بأكثر مما توقعت':          'Marwan wept… and confessed more than you expected',
+  'الصدمة تسري في القصر... أخوك حيّ!':            'Shock ripples through the palace… your brother is alive!',
+  'المحتال انكشف! العرش لك وحدك!':                'The impostor is exposed! The throne is yours alone!',
+  'الجدران تبتلعه... والشائعات تبقى حرة':         'The walls swallow him… but the rumours remain free',
+  'الشعب يحبّ الرحمة... والأخ يبتسم بعيون باردة': 'The people love mercy… and the brother smiles with cold eyes',
+  'الحرب تتوقف... والتحالف يُرسى':               'War pauses… the alliance is sealed',
+  'النبلاء يحتفلون... الشعب يترقّب':              'The nobles celebrate… the people watch and wait',
+  'الحكماء يُؤيدون... مكانتهم ترسّخت معك':        'The Scholars approve… their standing is secured alongside yours',
+  'الميثاق يُقرأ في كل قرية... اسمك يُنقش في التاريخ': 'The Charter is read in every village… your name is etched in history',
+  'النور يُضاء... والجهل يتراجع':                  'Light is kindled… and ignorance retreats',
+  'الراية ترتفع... والحرب تبدأ من جديد':          'The banner rises… and war begins anew',
+  'النهاية كُتبت... والتاريخ يُسجّل':             'The ending is written… and history records',
+};
+
+function transEN(text) {
+  if (currentLang === 'ar') return text;
+  return TRANS_EN[text] || text;
+}
+
+// ── SCENES_EN ─────────────────────────────────────────────────
+const SCENES_EN = {
+  debt: {
+    chapter: 'Chapter One — The Weight of Inheritance',
+    title: "Father's Debts",
+    text: () => `
+      The moment you take the throne, <span class="char-name">Grand Vizier Marwan</span> summons you.
+      His face is pale, as one who carries news that could break a man's back.
+      <br><br>
+      <span class="whisper">"Your Majesty… our treasury is crushed under your father's debts. The northern banks are waiting. If we don't pay within forty days, they will send armed collectors."</span>
+      <br><br>
+      Three faces stare at you in the grand hall:
+      the merchant <span class="char-name">Jasper</span>, the commander <span class="char-name">General Tariq</span>, and the elder <span class="char-name">Elder Zaid</span>.
+      Each holds a solution — and each wants a price.
+    `,
+    memory: null,
+    choices_text: [
+      'Impose emergency taxes on nobles and wealthy merchants',
+      'Ask the army to forgo their bonuses — in exchange for a promise to double them',
+      "Borrow from the Scholars' treasury in exchange for privileges and council seats",
+    ],
+    chronicle: [
+      'Imposed emergency taxes on the nobles',
+      'Asked the army to sacrifice bonuses for a future promise',
+      "Borrowed from the Scholars' treasury in exchange for privileges",
+    ],
+  },
+  drought: {
+    chapter: 'Chapter Two — The Thirsty Land',
+    title: "Hell's Summer",
+    text: () => {
+      let extra = 'Famine approaches and time is running out.';
+      if (G.tags.has('taxed_nobles')) extra = `The furious nobles <span class="dramatic">refuse to help</span>, protesting the taxes. The crisis runs deeper than it had to.`;
+      else if (G.tags.has('army_debt')) extra = `The resentful soldiers <span class="dramatic">deliberately slow</span> supply distribution. The promise has yet to be kept.`;
+      else if (G.tags.has('church_debt')) extra = `<span class="good-word">The Scholars open their hall</span> to the starving without asking permission — and the credit goes to them, not you.`;
+      return `
+        Three months without rain. The southern villages' crops wither in the fields,
+        and farmers march toward the capital with faces dry as cracked mud.
+        <br><br>
+        <span class="char-name">Marwan</span> lays a frightening report before you:
+        <span class="whisper">"If we don't intervene within two weeks, children will start dying."</span>
+        <br><br>
+        ${extra}
+      `;
+    },
+    memory: () => G.tags.has('taxed_nobles') ? '📌 The nobles are furious over the taxes' :
+                  G.tags.has('army_debt') ? '⚔️ The army was not rewarded as you promised' :
+                  G.tags.has('church_debt') ? '📜 The Scholars are now an independent power' : null,
+    choices_text: [
+      'Open the royal grain stores for free — no one goes hungry',
+      'Send the army to dig irrigation canals from the northern river',
+      'Buy grain from northern merchants at any price',
+    ],
+    chronicle: [
+      'Opened royal grain stores for the people',
+      'Ordered the army to dig irrigation canals',
+      'Bought grain from the North with the treasury',
+    ],
+  },
+  rebellion: {
+    chapter: 'Chapter Three — Strife Ignites',
+    title: 'Prince Ivan Breaks His Oath',
+    text: () => {
+      let extra = 'The situation is delicate, and every step has its price.';
+      if (G.tags.has('opened_stores')) extra = `<span class="good-word">Your people stand firmly behind you</span> after you fed them — but the army remains wavering.`;
+      else if (G.tags.has('army_debt')) extra = `<span class="dramatic">The soldiers hesitate to comply</span> — the memory of the broken promise looms in their minds.`;
+      return `
+        A leaked message arrives from the Eastern Palace:
+        <span class="char-name">Prince Ivan Drakoff</span> declares that the throne deserves someone more worthy.
+        He has stopped paying taxes and withdrawn his soldiers from the borders.
+        <br><br>
+        <span class="char-name">Tariq</span> slams the table: <span class="whisper">"Let me march on him now. This rebel deserves no parley."</span>
+        <br><br>
+        ${extra}
+      `;
+    },
+    memory: () => G.tags.has('army_debt') ? "⚠️ The army is still angry over your broken promise" :
+                  G.tags.has('opened_stores') ? '💚 The people strongly support you — that\'s leverage' : null,
+    choices_text: [
+      'Send the army to crush the rebellion immediately by force',
+      'Invite him to a banquet and offer him the position of Chief Advisor',
+      'Publicly accuse him of treason and wait for the factions to rally',
+    ],
+    chronicle: [
+      "Crushed Prince Ivan's rebellion by force",
+      'Negotiated with the Prince and granted him a position',
+      'Publicly accused the Prince and awaited faction support',
+    ],
+  },
+  war_council: {
+    chapter: 'Chapter Three & a Half — The War Room',
+    title: 'The Grand War Council',
+    text: () => {
+      let extra = 'The council waits. The decision is yours alone.';
+      if (G.tags.has('diplomacy_rebel')) extra = `<span class="char-name">Prince Ivan</span> stands quietly in the corner. When your eyes meet, he nods — <span class="good-word">his soldiers are on their way.</span>`;
+      else if (G.tags.has('crushed_rebel')) extra = `Your last victory gave the army <span class="good-word">high confidence</span>, but Tariq warns: <span class="whisper">"Thandar has learned from its mistakes."</span>`;
+      else if (G.tags.has('army_debt')) extra = `<span class="dramatic">In the corner, three commanders whisper.</span> Tariq informs you with worried eyes: <span class="whisper">"The promise has not been kept yet, Your Majesty."</span>`;
+      return `
+        Four faces stare at the map of Arihan spread across the table.
+        <span class="char-name">Tariq</span> pounds the table with his fist:
+        <span class="whisper">"Thandar is moving. Our intelligence confirms thirty thousand troops at the border."</span>
+        <br><br>
+        <span class="char-name">Leyla</span> traces circles on the map with her finger:
+        <span class="whisper">"War is not the only option — they want a trade route, not land."</span>
+        <br><br>
+        <span class="char-name">Elder Zaid</span> falls silent for a long moment, then raises his head:
+        <span class="whisper">"Your Majesty, the army needs a week to muster. Buy time."</span>
+        <br><br>
+        ${extra}
+      `;
+    },
+    memory: () => G.tags.has('diplomacy_rebel') ? '🤝 Prince Ivan is now an ally with his soldiers' :
+                  G.tags.has('army_debt') ? '⚠️ Commanders remember the promise — loyalty shaky' :
+                  G.tags.has('crushed_rebel') ? '⚔️ Your last victory strengthened your military standing' : '🗺️ The War Council deliberates',
+    choices_text: [
+      "Endorse Tariq's military plan — war with Thandar is inevitable",
+      "Adopt Leyla's approach — send an envoy to understand Thandar's demands first",
+      "Adopt Zaid's counsel — buy time with gold, then decide",
+    ],
+    chronicle: [
+      'Endorsed the war plan in the war council',
+      "Sent a diplomatic envoy to probe Thandar's intentions",
+      'Bought time with gold to prepare the army',
+    ],
+  },
+  invasion: {
+    chapter: 'Chapter Four — The Invasion',
+    title: 'The Northern Lions March',
+    text: () => {
+      let extra = 'Battle is inevitable… how will you fight it?';
+      if (G.tags.has('sent_envoy')) extra = `<span class="good-word">Your envoy returned with valuable intelligence:</span> Thandar wants only the northern trade route — not all the land. <span class="char-name">Tariq</span> sees an opportunity.`;
+      else if (G.tags.has('bought_time')) extra = `<span class="good-word">The extra month you purchased</span> made the army far more prepared. Plans were laid, supplies gathered.`;
+      else if (G.tags.has('council_war')) extra = `Tariq's plan is ready. Soldiers know their positions. <span class="good-word">The initiative is yours.</span>`;
+      else if (G.tags.has('crushed_rebel') && G.tags.has('dug_canals')) extra = `Your army is <span class="good-word">unified with high morale</span>, and the irrigation canals ensure cities are supplied.`;
+      else if (G.tags.has('diplomacy_rebel')) extra = `<span class="char-name">Prince Ivan</span> offers you his soldiers — diplomacy has borne fruit!`;
+      else if (G.tags.has('army_debt')) extra = `<span class="dramatic">Some army commanders grumble loudly</span> — the promise was never kept.`;
+      return `
+        Thirty thousand soldiers from <span class="char-name">the Kingdom of Thandar</span> cross the border.
+        Their commander <span class="char-name">General Thorvinn</span> sends one message:
+        <span class="whisper"><span class="dramatic">"Surrender, or we burn villages one by one."</span></span>
+        <br><br>
+        The war council convenes in a room thick with smoke and fear.
+        <br><br>
+        ${extra}
+      `;
+    },
+    memory: () => G.tags.has('diplomacy_rebel') ? '🤝 Prince Ivan is now your ally' :
+                  G.tags.has('crushed_rebel') ? '⚔️ Your army is battle-hardened and victorious' :
+                  G.tags.has('army_debt') ? '⚠️ The army remembers your unfulfilled promise' : null,
+    choices_text: [
+      () => gT('Lead the army yourself — the King fights!', 'Lead the army yourself — the Queen fights!'),
+      'Negotiate in exchange for ceding border territories',
+      'Scorched earth tactics — evacuate the border as a trap',
+    ],
+    chronicle: [
+      'Led the army personally in the Battle of Thandar',
+      'Ceded territories to stop the war',
+      'Burned the border as a trap for the invaders',
+    ],
+  },
+  plague: {
+    chapter: 'Chapter Five — The Black Plague',
+    title: 'Death Knocks at the Doors',
+    text: () => {
+      let extra = 'The city awaits your decision, Your Majesty.';
+      if (G.tags.has('led_battle')) extra = `<span class="good-word">Your people trust you completely</span> after seeing you fight alongside them — your decisions will be obeyed without hesitation.`;
+      else if (G.tags.has('scorched_earth')) extra = `<span class="dramatic">The destroyed border villages</span> form wretched zones nearly impossible to quarantine.`;
+      else if (G.tags.has('church_debt')) extra = `<span class="char-name">Elder Zaid</span> reminds you of the old debt and sends an implicit message: <span class="whisper">"We are here… as we always have been."</span>`;
+      return `
+        Soldiers returning from the border brought back an unseen plague.
+        <br><br>
+        Within two weeks, a third of the city's shops closed. Physicians burn bodies by night.
+        <span class="char-name">Elder Zaid</span> calls for a council of scholars, while <span class="char-name">Karaz the royal physician</span> says:
+        <span class="whisper">"Strict quarantine is the only scientifically sound solution, Your Majesty."</span>
+        <br><br>
+        ${extra}
+      `;
+    },
+    memory: () => G.tags.has('church_debt') ? '📜 The Scholars are waiting in exchange for their help' :
+                  G.tags.has('led_battle') ? '💚 The people trust your leadership without reservation' :
+                  G.tags.has('scorched_earth') ? '⚠️ The destroyed villages complicate matters further' : null,
+    choices_text: [
+      'Total quarantine of infected cities, even at economic cost',
+      'Spend the entire treasury on treatment — no one dies alone',
+      'Delegate crisis management to the Scholars in exchange for broader concessions',
+    ],
+    chronicle: [
+      'Quarantined infected cities completely',
+      'Spent the entire treasury to treat the sick',
+      'Delegated the plague crisis to the Scholars in exchange for concessions',
+    ],
+  },
+  treasury_dilemma: {
+    chapter: 'Chapter Five and a Half — The Weight of Gold',
+    title: 'The Treasury Fades',
+    text: () => {
+      let extra = 'The economic crisis was no surprise — but its true magnitude is staggering.';
+      if (G.tags.has('treasury_empty')) extra = `<span class="dramatic">The plague drained the last reserves.</span> Jasper adds: <span class="whisper">"The situation is worse than I anticipated, Your Majesty."</span>`;
+      else if (G.tags.has('healed_all')) extra = `The people know your sacrifice and call you the just ruler — <span class="good-word">but a just ruler who is bankrupt does not reign long.</span>`;
+      else if (G.tags.has('bought_grain')) extra = `Buying grain from the North depleted reserves that have yet to be replenished. Jasper makes no effort to hide his concern.`;
+      return `
+        <span class="char-name">Jasper</span>, the kingdom's greatest merchant, requests an urgent audience.
+        He sits before you and places a thick ledger on the table — numbers upon numbers.
+        <br><br>
+        <span class="whisper">"Your Majesty, the treasury will last three months. After that, we cannot pay the army's wages."</span>
+        <br><br>
+        ${extra}
+      `;
+    },
+    memory: () => G.tags.has('treasury_empty') ? '💸 Treasury nearly empty after treating the plague' :
+                  G.tags.has('church_debt') ? '📜 The Scholars lent before — will they do it again?' :
+                  '⚖️ Jasper knows every secret of the treasury',
+    choices_text: [
+      'Offer Jasper trade monopolies in exchange for an emergency loan',
+      'Impose an extraordinary tax on top nobles and merchants',
+      'Sell some royal lands — sacrifice begins from the palace',
+    ],
+    chronicle: [
+      'Struck a deal with Jasper in exchange for a loan and monopolies',
+      'Imposed an extraordinary tax on the wealthy to save the treasury',
+      'Sold royal lands to save the treasury',
+    ],
+  },
+  betrayal: {
+    chapter: 'Chapter Six — The Knife in the Back',
+    title: "Marwan's Betrayal",
+    text: () => {
+      const ngKnows = G.tags.has('ng_knows_murder')
+        ? `<div class="ng-scene-tag">✦ NG+ — You know more than they think</div>
+           <span class="good-word">Nasr and Leyla gave you the advantage.</span>
+           This letter does not surprise you. Marwan does not know you know —
+           <span class="dramatic">and that is the most powerful weapon in your hands now.</span><br><br>` : '';
+      let extra = 'The palace holds its breath. Everyone watches how you act.';
+      if (G.tags.has('yusuf_deal')) extra = `<span class="dramatic">Jasper smiles in the corner</span> — your deal bound him to you, but it bound you to him as well. Is he entangled with Marwan?`;
+      else if (G.tags.has('king_sacrifice')) extra = `<span class="good-word">The people know your sacrifice of the royal lands.</span> That credit may shield you from backlash.`;
+      else if (G.tags.has('diplomacy_rebel')) extra = `<span class="char-name">Prince Ivan</span>, your ally, confirms: <span class="good-word">"I saw Marwan meeting with Thandar's spies with my own eyes."</span>`;
+      else if (G.tags.has('taxed_nobles')) extra = `<span class="dramatic">The furious nobles secretly support Marwan</span> — they see him as an ally against you.`;
+      return `${ngKnows}
+        On a cold night, an anonymous letter appears beneath your pillow.
+        It contains detailed evidence: <span class="char-name">Marwan</span>, your vizier since day one —
+        was the one who advised your father to take the loans that crushed the treasury,
+        and was the one leaking intelligence to Thandar before the invasion.
+        <br><br>
+        <span class="whisper">A voice in your head: "Act rashly, and you'll turn half the court against you."</span>
+        <br><br>
+        ${extra}
+      `;
+    },
+    memory: () => G.tags.has('diplomacy_rebel') ? '🤝 Prince Ivan is an eyewitness against Marwan' :
+                  G.tags.has('taxed_nobles') ? '⚠️ The nobles back Marwan — act with care' :
+                  '🗡️ Marwan was the closest person to you',
+    choices_text: [
+      'A public trial — the evidence before all',
+      'Exile him quietly without scandal — the kingdom cannot bear a public shame',
+      'Grant him a chance to confess in exchange for mercy',
+    ],
+    chronicle: [
+      'Tried Marwan publicly before the people and factions',
+      'Exiled Marwan silently, away from the spotlight',
+      'Granted Marwan a chance to confess and showed mercy',
+    ],
+  },
+  pretender: {
+    chapter: 'Chapter Seven — Blood of Kings',
+    title: 'The Claimant to the Throne',
+    text: () => {
+      let extra = 'The truth is buried… and you must decide.';
+      if (G.tags.has('solomon_secret')) extra = `<span class="good-word">Marwan confessed the truth:</span> this young man is real — your father told him years before his death. <span class="dramatic">Your illegitimate brother is alive.</span>`;
+      else if (G.tags.has('public_trial')) extra = `After the Marwan scandal, <span class="dramatic">the people are ready to believe any claim</span> that shakes the throne.`;
+      else if (G.tags.has('crushed_rebel')) extra = `Your military strength stands behind you — but <span class="whisper">swords cannot silence doubt.</span>`;
+      return `
+        From the distant Eastern lands comes a young man claiming to be <span class="dramatic">your father's son from a secret marriage</span>.
+        He carries documents that appear genuine, and an old royal signet seen by very few.
+        <br><br>
+        <span class="char-name">Leyla</span> sits before you, her eyes full of concern:
+        <span class="whisper">"Your Majesty, if he is real, half the kingdom will follow him. And if he is false — who sent him?"</span>
+        <br><br>
+        ${extra}
+      `;
+    },
+    memory: () => G.tags.has('solomon_secret') ? '💀 Marwan revealed: the claimant is your true brother' :
+                  G.tags.has('public_trial') ? "⚖️ Marwan's trial sowed doubt in every heart" :
+                  '👑 Who sent this young man? And why now?',
+    choices_text: [
+      'A blood test before the Scholars and nobles — truth stands above all',
+      'Arrest him immediately — those who question the ruler deserve the dungeon',
+      'Acknowledge him as a brother and grant him an honorary title — keep your enemies close',
+    ],
+    chronicle: [
+      'Blood test revealed: the claimant is a true brother',
+      'Blood test exposed the false claimant before all',
+      'Imprisoned the claimant without public trial',
+      'Acknowledged the claimant as brother and granted him a title',
+    ],
+  },
+  political_marriage: {
+    chapter: 'Chapter Eight — The Mark of Alliance',
+    title: 'The Alliance Bargain',
+    text: () => `
+      Ambassadors from three regions compete to forge an alliance through marriage.
+      <span class="char-name">Leyla</span> lays the proposals before you:
+      <br><br>
+      The General's daughter from Thandar — an alliance that stops the wars.
+      A noble princess from the East — silences their opposition and fills the treasury.
+      And the granddaughter of the Head Scholar — granting you unmatched religious legitimacy.
+      <br><br>
+      <span class="whisper">"Every choice, Your Majesty, closes one door and opens three."</span>
+    `,
+    memory: () => G.tags.has('surrendered_land') ? '🏳️ Thandar has not forgotten you ceded your lands' :
+                  G.tags.has('brother_revealed') ? "👑 Your brother's presence complicates any alliance" : null,
+    choices_text: [
+      "The General's daughter — peace with Thandar above all else",
+      "The noble princess — wealth and internal stability are the foundation of rule",
+      "The Head Scholar's granddaughter — wisdom and counsel cannot be bought with gold",
+    ],
+    chronicle: [
+      'Married the daughter of the Northern General',
+      'Married the noble princess from the East',
+      'Married the granddaughter of the Head Scholar',
+    ],
+  },
+  legacy: {
+    chapter: "The Final Chapter — Arihan's Legacy",
+    title: 'The Last Decision',
+    text: () => {
+      const base = `
+        Ten years have passed since you first sat on Arihan's throne.
+        The kingdom has changed. You have changed. And now one decision will define how you are remembered.
+        <br><br>
+        <span class="char-name">Leyla</span> stands beside you one last time:
+        <span class="whisper">"Your Majesty, ${gT('every ruler leaves something. What do you wish to leave','every ruler leaves something. What do you wish to leave')} for Arihan?"</span>
+        <br><br>
+      `;
+      if (G.tags.has('brother_revealed') || G.tags.has('adopted_brother'))
+        return base + `<span class="char-name">Your brother</span> stands in the corner, watching. His eyes reveal nothing — love? Resentment? Or ambition?`;
+      if (G.tags.has('king_sacrifice'))
+        return base + `<span class="good-word">The people still retell the story of the ruler who sold their land</span> to feed them. Leyla pats your shoulder: <span class="whisper">"What you gave will not be forgotten."</span>`;
+      if (G.tags.has('healed_all'))
+        return base + `The people whose wounds you healed still cheer your name in the markets. <span class="char-name">Karaz the physician</span> stands behind Leyla with grateful eyes.`;
+      if (G.tags.has('led_battle'))
+        return base + `The soldiers who fought beside you became fathers and mothers — they tell their children of the ruler who descended from the throne and carried a sword.`;
+      if (G.tags.has('yusuf_deal'))
+        return base + `<span class="char-name">Jasper</span> sits in the background. Leyla's gaze at him is cold: <span class="whisper">"Some deals stay with you longer than you'd like, Your Majesty."</span>`;
+      return base + `Arihan waits. History readies its pen.`;
+    },
+    memory: () => {
+      if (G.tags.has('adopted_brother') || G.tags.has('brother_revealed')) return '👑 Your brother still watches from within the palace';
+      if (G.tags.has('forgave_solomon')) return '🕯️ Your mercy toward Marwan taught people the meaning of justice';
+      return '📜 Ten years of decisions lead to this moment';
+    },
+    choices_text: [
+      "The Charter of Rights — the first law protecting the people from noble tyranny",
+      "The Grand University — knowledge and medicine for all of Arihan's children",
+      "The Empire — Arihan expands and Thandar will pay the price",
+    ],
+    chronicle: [
+      'Issued the Charter of Rights to protect the people',
+      'Founded the Grand University for all of Arihan',
+      'Declared Arihan an empire and began expansion',
+    ],
+  },
+};
+
+// ── RANDOM EVENTS EN ─────────────────────────────────────────
+const RANDOM_EVENTS_EN = {
+  spy_caught: { title:'A Spy in the Palace', text:'Your guards catch a man photographing palace maps at night. Under interrogation, he reveals he works for northern nobles seeking to destabilize your throne.', choices:['Execute him immediately — a message to others','Turn him into a double agent'] },
+  harvest_miracle: { title:'Season of Abundance', text:"Against all expectations, this year's harvest is plentiful. The farmers say it is a blessing from God upon your righteous reign.", choices:['Distribute the surplus to the poor in full','Store it in the treasury for emergencies'] },
+  leyla_arrives: { title:'The Mysterious Advisor', text:'A woman named <strong>Leyla</strong> requests an audience. She studied in Eastern academies and speaks seven languages. Her eyes read rooms before people.', choices:['Accept her as a personal advisor','Refuse — the palace is not for strangers'] },
+  merchants_petition: { title:"The Merchants' Delegation", text:'Twenty merchants demand the abolition of road taxes. They claim it impoverishes the economy. The nobles object — this tax is part of their income.', choices:['Abolish it — trade enriches all','Halve it — a middle ground'] },
+  army_promotion: { title:'The Battle Hero', text:'A young officer from a poor family saved an entire battalion. Tariq proposes promoting him to Commander of the Royal Guard. The nobles refuse — the family is not noble.', choices:['Promote him — merit above lineage','Award him a medal — traditions matter'] },
+  secret_library: { title:"Your Father's Secret Library", text:"Behind a wall in an old storeroom, you find your father's hidden library. It contains secret documents — some revealing hidden deals, others holding maps to buried treasure.", choices:['Announce the documents — transparency first','Use the maps in secret'] },
+  wandering_healer: { title:'The Strange Physician', text:'A wandering healer claims cures for diseases without remedy. The Scholars accuse him of charlatanism. The people believe him and gather around him.', choices:['Invite him to the palace and officially sponsor him','Expel him — no place for superstition'] },
+  poet_scandal: { title:'A Poem That Shakes the Court', text:'A young poet published a satirical poem mocking the nobles and glorifying the people. The nobles demand his tongue be cut. The people recite the poem in every alley.', choices:['Protect the poet — freedom of expression is sacred','Imprison him — stability above all','Pardon him and make him the court poet'] },
+  earthquake: { title:'The Eastern Earthquake', text:'An earthquake strikes the eastern region. A thousand homes collapse, and thousands of displaced people march toward the capital. The treasury groans — but conscience speaks.', choices:['Declare a state of emergency and send all resources','Send limited aid and maintain priorities'] },
+  foreign_ambassador: { title:'An Ambassador from the Far West', text:"An ambassador from a distant kingdom offers a trade alliance — new routes and unknown markets. But the Scholars suspect his motives.", choices:['Sign the treaty — trade enriches all','Refuse until you study it more deeply'] },
+  royal_treasury_thief: { title:'The Thief in the Treasury', text:"An old guard is caught stealing from the royal treasury. Investigation reveals he was sending money to his impoverished family. The law is clear — but the heart speaks.", choices:['Dismiss and punish him — no exceptions to the law','Pardon him and provide for his family from the treasury'] },
+};
+
+// ── REACTIONS EN ─────────────────────────────────────────────
+const REACTIONS_EN = {
+  people: {
+    up: ['The people cheer your name in the alleys!','Hearts lean toward you, O ruler','The people\'s blessing anchors the throne','Joy spreads across the city'],
+    down: ['Murmurs of discontent fill the streets...','Anger rises in the roads','The people\'s trust erodes bit by bit','Complaint precedes rebellion...'],
+  },
+  army: {
+    up: ['The soldiers raise their swords in loyalty!','The army is more united today','Troop morale has never been higher!','The barracks ring with the ruler\'s name!'],
+    down: ['Whispers of discontent run through the soldiers...','The army slowly loses its spirit','Grumbling spreads through the ranks','Loyalty begins to fracture...'],
+  },
+  nobles: {
+    up: ['The nobles express their approval','The influential stand in your corner','Wealth flows into your treasury'],
+    down: ['The nobles confer behind closed doors...','Money dries up and its owners pull away','A quiet fury simmers in the noble halls...'],
+  },
+  church: {
+    up: ['The Scholars endorse and support your decision','Your legitimacy grows stronger','Elder Zaid praises your wisdom'],
+    down: ['The Scholars express clear reservations...','Your legitimacy is now in question','The Scholars hesitate in their support...'],
+  },
+};
+
+// ── YEAR DISPLAY EN ──────────────────────────────────────────
+const YEAR_NAMES_EN = ['','First Year','Second Year','Third Year','Fourth Year','Fifth Year','Sixth Year','Seventh Year','Eighth Year','Ninth Year','Tenth Year','Eleventh Year','Twelfth Year','Thirteenth Year','Fourteenth Year','Fifteenth Year'];
+
+// ── CHRONICLE MAP EN ─────────────────────────────────────────
+const CHRONICLE_EN = {
+  'فرض ضريبة طارئة على النبلاء': 'Imposed emergency taxes on the nobles',
+  'طلب تضحية من الجيش بوعد بالمضاعفة': 'Asked the army to sacrifice bonuses for a future promise',
+  'استعار من خزينة الحكماء مقابل امتيازات': "Borrowed from the Scholars' treasury in exchange for privileges",
+  'فتح المخازن الملكية للشعب': 'Opened the royal grain stores for the people',
+  'أمر الجيش بحفر قنوات الري': 'Ordered the army to dig irrigation canals',
+  'شراء الحبوب من الشمال بالخزينة': 'Bought grain from the North with the treasury',
+  'أخمد تمرد الأمير إيفان بالقوة': "Crushed Prince Ivan's rebellion by force",
+  'تفاوض مع الأمير ومنحه منصباً': 'Negotiated with the Prince and granted him a position',
+  'اتهم الأمير علناً وانتظر الدعم': 'Publicly accused the Prince and awaited faction support',
+  'صادق على خطة الحرب في مجلس الوزراء': 'Endorsed the war plan in the war council',
+  'أرسل مبعوثاً دبلوماسياً لاستطلاع نوايا الثندار': "Sent a diplomatic envoy to probe Thandar's intentions",
+  'اشترى وقتاً بالذهب لتحضير الجيش': 'Bought time with gold to prepare the army',
+  'قاد الجيش شخصياً في معركة الثندار': 'Led the army personally in the Battle of Thandar',
+  'تنازل عن أراضٍ لإيقاف الحرب': 'Ceded territories to stop the war',
+  'حرق الحدود كمصيدة للغزاة': 'Burned the border as a trap for the invaders',
+  'عزل المدن المصابة بالكامل': 'Quarantined infected cities completely',
+  'صرف الخزينة كاملاً على علاج المرضى': 'Spent the entire treasury to treat the sick',
+  'أوكل الحكماء إدارة الوباء مقابل منح': 'Delegated the plague crisis to the Scholars',
+  'عقد صفقة مع جابر الثري مقابل قرض وامتيازات': 'Struck a deal with Jasper in exchange for a loan and monopolies',
+  'فرض ضريبة استثنائية على الأثرياء لإنقاذ الخزينة': 'Imposed an extraordinary tax on the wealthy to save the treasury',
+  'باع أراضي ملكية لإنقاذ الخزينة': 'Sold royal lands to save the treasury',
+  'حاكم مروان علناً أمام الشعب والفصائل': 'Tried Marwan publicly before the people and factions',
+  'أبعد مروان في صمت بعيداً عن الأضواء': 'Exiled Marwan silently, away from the spotlight',
+  'منح مروان فرصة الاعتراف والرحمة': 'Granted Marwan a chance to confess and showed mercy',
+  'اختبار الدم كشف: المدّعي أخ حقيقي': 'Blood test revealed: the claimant is a true brother',
+  'فضح المدّعي الكاذب أمام الجميع': 'Blood test exposed the false claimant before all',
+  'سجن المدّعي دون محاكمة علنية': 'Imprisoned the claimant without public trial',
+  'اعترف بالمدّعي أخاً ومنحه لقباً شرفياً': 'Acknowledged the claimant as brother with an honorary title',
+  'تزوّج ابنة الجنرال الشمالي': 'Married the daughter of the Northern General',
+  'تزوّج أميرة النبلاء من الشرق': 'Married the noble princess from the East',
+  'تزوّج ابنة كبير الحكماء': 'Married the granddaughter of the Head Scholar',
+  'أصدر ميثاق الحقوق لحماية الشعب': 'Issued the Charter of Rights to protect the people',
+  'أسّس الجامعة الكبرى لأبناء أريهان': 'Founded the Grand University for all of Arihan',
+  'أعلن أريهان إمبراطورية وبدأ التوسع': 'Declared Arihan an empire and began expansion',
+  '[NG+] عرف حقيقة ليلى وفتح معها تحالفاً عميقاً': '[NG+] Learned Leyla\'s truth and forged a deep alliance',
+  '[NG+] طلب من ليلى وثيقة رسمية قبل التصديق': '[NG+] Requested official documentation from Leyla',
+  '[NG+] رفض الاستماع لليلى وأغلق الباب': '[NG+] Refused to hear Leyla and closed the door',
+  '[NG+] تعامل مع الجاسوس بحنكة': '[NG+] Handled the spy with cunning',
+  '[NG+] أحال الجاسوس للمحاكمة العلنية': '[NG+] Sent the spy to public trial',
+};
+
+// ── ENDINGS EN ───────────────────────────────────────────────
+const ENDINGS_EN = {
+  legend: {
+    title: 'The Legendary Ruler', rank: 'First Rank: Greatest Rulers of Arihan',
+    story: () => {
+      const charter = G.tags.has('charter_issued') ? ' Issued the Charter of Rights that protected the people for centuries.' : '';
+      const uni = G.tags.has('university_built') ? ' Built the Grand University that lit minds and produced physicians and scholars.' : '';
+      const battle = G.tags.has('led_battle') ? gT(' Descended from the throne and fought shoulder to shoulder with the soldiers in the Battle of Thandar.','') : '';
+      const sac = G.tags.has('king_sacrifice') ? ' And when the treasury ran dry, sold the royal lands to feed the people.' : '';
+      const leyla = G.tags.has('leyla_trusted') ? ' And Leyla was the mirror that never lied.' : '';
+      return `<strong>${G.name}</strong> ruled with wisdom rarely matched in Arihan's history.${battle}${sac}${charter}${uni}${leyla} The people loved them, the army trusted them, the nobles respected them, and the Scholars yielded to their vision. When they drew their last breath, the rich and the poor, the frontline soldier and the village elder all wept together. Their name was etched in gold above the capital's gate and is read to this day.`;
+    },
+  },
+  sacrifice_legend: {
+    title: 'The Ruler Who Gave Everything', rank: 'Symbol of Sacrifice in Arihan',
+    story: () => {
+      const uni = G.tags.has('university_built') ? ' Then built the university on what remained of the treasury.' : '';
+      return `<strong>${G.name}</strong> was not the wealthiest nor the mightiest, but was the most giving. Sold the royal lands to feed the hungry and opened the treasury entirely to heal the sick.${uni} When they died poor by a king's standards, the people carried their coffin with untiring hands — for they were the heaviest ruler on the heart of history and the lightest on the shoulders of the people.`;
+    },
+  },
+  people_king: {
+    title: 'Beloved of the People', rank: 'The Humane Ruler',
+    story: () => {
+      const healed = G.tags.has('healed_all') ? ' Spent the treasury on the sick without hesitation.' : '';
+      const stores = G.tags.has('opened_stores') ? ' And opened the grain stores when the poor went hungry.' : '';
+      const poet = G.tags.has('poet_protected') ? ' And protected the poet who said what rulers fear.' : '';
+      return `<strong>${G.name}</strong> was not the strongest or wealthiest of rulers, but was the most merciful.${healed}${stores}${poet} Chose the people over power, and justice over prestige. When they died, the poor carried the coffin before the nobles — and children who never knew them placed flowers on the grave because their mothers told them the story.`;
+    },
+  },
+  warrior_king: {
+    title: 'The Warrior Ruler', rank: 'Vanquisher of Thandar',
+    story: () => {
+      const emp = G.tags.has('empire_declared') ? ' Then declared the Empire and extended the banner beyond the mountains.' : '';
+      const dip = G.tags.has('sent_envoy') ? ' But knew when to send the envoy before the sword.' : '';
+      return `<strong>${G.name}</strong> marched at the head of the army and the people cheered.${emp}${dip} History preserves their victories — and forgets what was destroyed behind them. The soldiers who fought with them tell their grandchildren: "I saw the ruler drinking from the same river as us."`;
+    },
+  },
+  diplomat_king: {
+    title: 'The Ruler Who Never Drew a Sword', rank: 'Master of Word and Understanding',
+    story: () => {
+      const bro = G.tags.has('adopted_brother') ? ' And the claimant who once could have been the greatest enemy became the most loyal advisor.' : '';
+      return `<strong>${G.name}</strong>'s advisors always said: "War is faster." And the reply was always: "War builds no city." Negotiated with rebels, wrote to enemies, sent envoys before soldiers.${bro} Arihan under this reign was never made to widow its women — and that alone is enough to be written into memory.`;
+    },
+  },
+  church_puppet: {
+    title: 'A Ruler in the Shadow of the Scholars', rank: 'A History Written by Others',
+    story: () => {
+      const debt = G.tags.has('church_debt') ? ' From the very first day, when they borrowed from the Scholars\' treasury, they had their path drawn for them.' : '';
+      return `<strong>${G.name}</strong> ruled, but Elder Zaid was the one who truly made the decisions.${debt} The Scholars won, and the ruler became their polished facade. When they died, their successor also came from the Scholars. History remembers the Elder's name more than the ruler's.`;
+    },
+  },
+  noble_puppet: {
+    title: "The Nobles' Ruler", rank: 'The Empty Golden Throne',
+    story: () => {
+      const j = G.tags.has('yusuf_deal') ? ' Jasper was the most frequent face in the palace.' : '';
+      return `<strong>${G.name}</strong> ruled from a gold-plated throne, but the gold was not theirs.${j} The nobles gave them the title and kept the power. The people outside call for a ruler who sees them. History records the reign as: "The wealthy ruled, and the poor paid the price."`;
+    },
+  },
+  brother_king: {
+    title: 'Two Rulers, One Soul', rank: 'The One Who Ended the Hatred of Blood',
+    story: () => {
+      const r = G.tags.has('solomon_secret') ? " Learned the truth from Marwan's confession — and still opened their arms." : '';
+      return `<strong>${G.name}</strong> decided that mercy is stronger than fear.${r} The brother who could have been the most dangerous enemy became the closest ally. Arihan knew for the first time a ruler who consulted their brother before their council. The people said: "This is a ruler who does not fear the truth."`;
+    },
+  },
+  leyla_ending: {
+    title: () => gT('In the Shadow of the Wise', 'Two Sages, One Throne'),
+    rank: () => 'The Ruler Who Knew When to Listen',
+    story: () => {
+      const ng = G.tags.has('ng_leyla_secret') ? ' And Leyla carried a deeper secret: she is the daughter of Nasr, the witness to everything.' : '';
+      return gT(
+        `<strong>Leyla</strong> knew the end of every story before it began.${ng} And <strong>${G.name}</strong> knew when to be silent and when to speak. Together they governed Arihan with a calm it had never known. The great decisions were made in quiet rooms, far from the noise. History wrote both their names together — the ruler and the sage — in a single chapter.`,
+        `<strong>Leyla</strong> knew the end of every story before it began.${ng} And <strong>${G.name}</strong> knew when to be silent and when to speak. Two sages, one throne, and Arihan had never seen the like. History wrote both their names together — in a chapter that cannot be closed.`
+      );
+    },
+  },
+  empire: {
+    title: () => 'Founder of the Empire', rank: 'The Greatest Conqueror',
+    story: () => {
+      const ch = G.tags.has('charter_issued') ? ' But in their final days, issued the Charter — perhaps as atonement for the bloodshed.' : '';
+      return `<strong>${G.name}</strong> was not content with Arihan. The banner rose in lands their father never dreamed of. Thandar retreated. Borders expanded. Villages were built on the rubble of what was torn down.${ch} History remembers them as a great conqueror — and other poets remember them in other words.`;
+    },
+  },
+  collapse_betrayed: {
+    title: 'A Kingdom Without Memory', rank: 'Fell in the Age of Scandals',
+    story: () => `The Marwan trial was the spark that <strong>${G.name}</strong> lit with their own hands. The scandal dispersed what little trust remained. The nobles allied, the people tired, and the army sought a new leader. The throne fell on a rainy night, and the imprisoned poet wrote: "The ruler themselves lit the fire that consumed them."`,
+  },
+  collapse: {
+    title: 'The Fall of Arihan', rank: 'Last of the Royal Line',
+    story: () => {
+      const n = G.tags.has('scorched_earth') ? ' The scorched lands never recovered.' : G.tags.has('army_debt') ? ' The army whose promise was broken was the last to surrender the fortress.' : '';
+      return `The name <strong>${G.name}</strong> is written only alongside one word: catastrophe.${n} The people rose, the army fractured, and the kingdom cracked like old clay. Arihan… was no longer the Arihan that was inherited.`;
+    },
+  },
+  forgotten: {
+    title: () => 'The Forgotten Ruler',
+    rank: () => 'An Ordinary Ruler in Extraordinary Times',
+    story: () => {
+      const c = G.choices.length;
+      return `<strong>${G.name}</strong> ruled for years. ${c >= 8 ? 'Made many decisions — but none are remembered.' : 'Ruled in a silence closer to hesitation.'} Neither brilliant nor ruinous. Wavering decisions, modest successes and acceptable failures. History passed over them as wind passes over sand — moving without changing.`;
+    },
+  },
+};
+
+// ── UI STRINGS EN ────────────────────────────────────────────
+const UI_EN = {
+  splash_sub: 'Kingdom of Decision & Destiny',
+  splash_hint: 'The kingdom awaits you…',
+  pers_label: '✦ Your Ruling Nature ✦',
+  pers_sage: 'The Sage', pers_sage_bonus: '+Scholars start',
+  pers_warrior: 'The Warrior', pers_warrior_bonus: '+Army start',
+  pers_diplomat: 'The Diplomat', pers_diplomat_bonus: '+People start',
+  gender_label: '✦ Who Are You? ✦',
+  gender_male: 'King', gender_female: 'Queen',
+  name_label_m: '✦ What is your name, O King? ✦',
+  name_label_f: '✦ What is your name, O Queen? ✦',
+  name_placeholder_m: 'Enter your name…', name_placeholder_f: 'Enter your name…',
+  start_btn_m: '⚔️ Claim the Throne ⚔️', start_btn_f: '⚔️ Claim the Throne ⚔️',
+  f_people: 'People', f_army: 'Army', f_nobles: 'Nobles', f_church: 'Scholars',
+  f_people_desc: 'Your true power', f_army_desc: 'Guardians of the throne',
+  f_nobles_desc: 'Owners of wealth', f_church_desc: 'Counsel & wisdom',
+  map_btn: '🗺️ Map', map_title: '🗺️ Map of the Kingdom of Arihan', map_close: '✕ Close Map',
+  choices_header_m: '— Choose your path, O King —',
+  choices_header_f: '— Choose your path, O Queen —',
+  event_tag: '— Urgent Event —',
+  save_text: '💾 Auto-saved',
+  ach_title: 'New Achievement',
+  score_label: 'Governance Score',
+  chronicle_title: "📜 The Ruler's Decision Chronicle",
+  standings_title: '⚖️ Faction Balance at End of Reign',
+  replay_btn: '🔄 Start a New Path',
+  share_btn: '📤 Share Your Ending',
+  years_label: 'Years of Reign',
+  pers_sum_title: '✦ Your Ruling Nature ✦',
+  ng_badge: '✦ Hard Governance Mode — New Game+ ✦',
+  ng_scene_tag: '✦ Exclusive Scene — New Game+',
+  ng_btn_text: '✦ New Game+ — Hard Mode',
+  king_title_m: 'King', king_title_f: 'Queen',
+  chapter_prefix: 'Chapter ',
+  newspaper_name: 'THE ARIHAN HERALD',
+};
+
+const UI_AR = {
+  splash_sub: 'مملكة القرار والمصير',
+  splash_hint: 'المملكة تنتظرك...',
+  pers_label: '✦ طبيعة حكمك ✦',
+  pers_sage: 'الحكيم', pers_sage_bonus: '+حكماء بداية',
+  pers_warrior: 'المحارب', pers_warrior_bonus: '+جيش بداية',
+  pers_diplomat: 'الدبلوماسي', pers_diplomat_bonus: '+شعب بداية',
+  gender_label: '✦ من تكون؟ ✦',
+  gender_male: 'ملك', gender_female: 'ملكة',
+  name_label_m: '✦ ما اسمك أيها الملك؟ ✦',
+  name_label_f: '✦ ما اسمكِ أيتها الملكة؟ ✦',
+  name_placeholder_m: 'اكتب اسمك...', name_placeholder_f: 'اكتبي اسمكِ...',
+  start_btn_m: '⚔️ تسلّم العرش ⚔️', start_btn_f: '⚔️ تسلّمي العرش ⚔️',
+  f_people: 'الشعب', f_army: 'الجيش', f_nobles: 'النبلاء', f_church: 'الحكماء',
+  f_people_desc: 'قوتك الحقيقية', f_army_desc: 'حراس العرش',
+  f_nobles_desc: 'أصحاب الثروة', f_church_desc: 'مشورة ورأي',
+  map_btn: '🗺️ الخريطة', map_title: '🗺️ خريطة مملكة أريهان', map_close: '✕ أغلق الخريطة',
+  choices_header_m: '— اختر مسارك أيها الملك —',
+  choices_header_f: '— اختاري مسارك أيتها الملكة —',
+  event_tag: '— حدث طارئ —',
+  save_text: '💾 تم الحفظ تلقائياً',
+  ach_title: 'إنجاز جديد',
+  score_label: 'نقاط الحكم',
+  chronicle_title: '📜 سجل قرارات الملك',
+  standings_title: '⚖️ ميزان الفصائل في نهاية الحكم',
+  replay_btn: '🔄 ابدأ مساراً جديداً',
+  share_btn: '📤 شارك نهايتك',
+  years_label: 'سنوات من الحكم',
+  pers_sum_title: '✦ طبيعة حكمك ✦',
+  ng_badge: '✦ وضع الحكم الصعب — New Game+ ✦',
+  ng_scene_tag: '✦ مشهد حصري — New Game+',
+  ng_btn_text: '✦ New Game+ — الحكم الصعب',
+  king_title_m: 'الملك', king_title_f: 'الملكة',
+  chapter_prefix: 'الفصل ',
+  newspaper_name: 'جريدة أريهان الرسمية',
+};
+
+function ui(key) {
+  const map = currentLang === 'en' ? UI_EN : UI_AR;
+  return map[key] || (UI_AR[key] || key);
+}
+
+// ── ACHIEVEMENT NAMES EN ─────────────────────────────────────
+const ACHIEVEMENTS_EN = {
+  bold_start: () => 'Bold Beginning',
+  king_of_warriors: () => gT('Warrior King','Warrior Queen'),
+  heart_of_gold: () => 'Heart of Gold',
+  merciful_king: () => gT('The Merciful Ruler','The Merciful Ruler'),
+  sacrifice_king: () => gT('The Ruler Who Gave All','The Ruler Who Gave All'),
+  master_diplomat: () => gT('Master of Diplomacy','Mistress of Diplomacy'),
+  truth_seeker: () => 'Seeker of Truth',
+  iron_will: () => 'Iron Will',
+};
+
+// ── PERSONALITIES EN ─────────────────────────────────────────
+const PERSONALITIES_EN = {
+  sage:     { name:'The Sage',     desc:'You prefer wisdom and knowledge over power. The Scholars trust you from the start.' },
+  warrior:  { name:'The Warrior',  desc:'Born to fight. The army sees one of their own in you.' },
+  diplomat: { name:'The Diplomat', desc:'Words are your weapon. The people see a fair ruler, not just a king.' },
+};
+
+// ── SCORE RANK EN ────────────────────────────────────────────
+function getScoreRankEN(score) {
+  if (score >= 90) return 'Legendary 🌟';
+  if (score >= 75) return 'Excellent ⭐';
+  if (score >= 58) return 'Good 🏅';
+  if (score >= 42) return 'Average 📜';
+  return 'Weak 💀';
+}
+
+// ── PATCH REACTION DISPLAY ───────────────────────────────────
+const _applyOrig_bi = window.apply;
+window.apply = function(delta) {
+  const reactions = [];
+  const pool = currentLang === 'en' ? REACTIONS_EN : REACTIONS;
+  ['people','army','nobles','church'].forEach(f => {
+    if (delta[f] !== undefined && delta[f] !== 0) {
+      const msgs = pool[f]?.[delta[f] > 0 ? 'up' : 'down'];
+      if (msgs) reactions.push(msgs[Math.floor(Math.random() * msgs.length)]);
+    }
+  });
+  _applyOrig_bi(delta);
+  if (reactions.length > 0) pendingReaction = reactions[0];
+};
+
+// ── PATCH TRANSITION ─────────────────────────────────────────
+const _transOrig_bi = window.transition || transition;
+const _trans_patched = function(emoji, text, callback) {
+  const displayText = currentLang === 'en' ? (typeof text === 'function' ? text() : (TRANS_EN[text] || text)) : (typeof text === 'function' ? text() : text);
+  _transOrig_bi(emoji, displayText, callback);
+};
+window.transition = _trans_patched;
+
+// ── PATCH SHOWSCENE ──────────────────────────────────────────
+const _showSceneOrig_bi = window.showScene;
+window.showScene = function(sc) {
+  if (currentLang === 'en') {
+    // Inject EN scene data
+    const scId = Object.keys(SCENES).find(k => SCENES[k] === sc);
+    const enSc = scId ? SCENES_EN[scId] : null;
+    if (enSc) {
+      const patchedSc = Object.assign({}, sc, {
+        chapter: enSc.chapter,
+        title: enSc.title,
+        text: enSc.text,
+        memory: enSc.memory,
+        choices: sc.choices.map((c, i) => {
+          const enText = enSc.choices_text ? enSc.choices_text[i] : null;
+          return Object.assign({}, c, {
+            text: enText || c.text,
+            sub: c.sub.map(s => Object.assign({}, s, { label: translateSub(s.label) })),
+          });
+        }),
+      });
+      _showSceneOrig_bi(patchedSc);
+      // Localize character names in body
+      const body = document.getElementById('sceneBody');
+      if (body) body.innerHTML = localizeNames(body.innerHTML);
+      // Fix chapter indicator
+      const chInd = document.getElementById('chapterIndicator');
+      if (chInd) chInd.textContent = 'Chapter ' + (G.turn || 1);
+      // Fix year display
+      const yrEl = document.getElementById('yearDisplay');
+      if (yrEl) {
+        const yr = G.currentYear || G.turn;
+        yrEl.textContent = (YEAR_NAMES_EN[yr] || `Year ${yr}`) + ' of Reign';
+      }
+      // Fix choices header
+      const chHeader = document.getElementById('choicesHeader');
+      if (chHeader) chHeader.textContent = ui(G.gender === 'female' ? 'choices_header_f' : 'choices_header_m');
+      return;
+    }
+    // Fallback: just localize names
+    _showSceneOrig_bi(sc);
+    const body = document.getElementById('sceneBody');
+    if (body) body.innerHTML = localizeNames(body.innerHTML);
+  } else {
+    _showSceneOrig_bi(sc);
+  }
+};
+
+// ── PATCH RANDOM EVENTS ──────────────────────────────────────
+const _triggerEvOrig_bi = window.triggerRandomEvent || triggerRandomEvent;
+window.triggerRandomEvent = function(callback) {
+  if (currentLang === 'ar') { _triggerEvOrig_bi(callback); return; }
+  const unseen = RANDOM_EVENTS.filter(e => !G.seenEvents.has(e.id));
+  if (unseen.length === 0) { callback(); return; }
+  const totalWeight = unseen.reduce((s,e) => s+e.weight, 0);
+  let rand = Math.random() * totalWeight;
+  let chosen = unseen[0];
+  for (const e of unseen) { rand -= e.weight; if (rand <= 0) { chosen = e; break; } }
+  G.seenEvents.add(chosen.id);
+  const en = RANDOM_EVENTS_EN[chosen.id];
+  const modal = document.createElement('div');
+  modal.className = 'event-modal';
+  modal.innerHTML = `
+    <div class="event-inner">
+      <span class="event-emoji">${chosen.emoji}</span>
+      <div class="event-tag">— Urgent Event —</div>
+      <div class="event-title">${en ? en.title : chosen.title}</div>
+      <div class="event-text">${en ? en.text : chosen.text}</div>
+      <div class="event-choices" id="evChoices"></div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  const choicesEl = modal.querySelector('#evChoices');
+  chosen.choices.forEach((c, idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'event-choice-btn';
+    const enText = en?.choices?.[idx] || c.text;
+    btn.innerHTML = `<span style="font-size:22px">${c.emoji}</span><span>${enText}</span>`;
+    btn.onclick = () => {
+      apply(c.apply);
+      if (c.tag) G.tags.add(c.tag);
+      modal.style.opacity = '0';
+      modal.style.transition = 'opacity 0.35s';
+      setTimeout(() => { modal.remove(); callback(); }, 380);
+    };
+    choicesEl.appendChild(btn);
+  });
+};
+
+// ── PATCH SHOWENDING ─────────────────────────────────────────
+const _showEndingOrig_bi = window.showEnding;
+window.showEnding = function(e) {
+  if (currentLang === 'en') {
+    const enE = ENDINGS_EN[e.id];
+    if (enE) {
+      const patchedE = Object.assign({}, e, {
+        title: typeof enE.title === 'function' ? enE.title() : (enE.title || e.title),
+        rank:  typeof enE.rank  === 'function' ? enE.rank()  : (enE.rank  || e.rank),
+        story: enE.story,
+      });
+      _showEndingOrig_bi(patchedE);
+    } else {
+      _showEndingOrig_bi(e);
+    }
+    // EN-specific ending UI patches
+    setTimeout(() => {
+      const scoreLabel = document.querySelector('.score-label');
+      if (scoreLabel) scoreLabel.textContent = ui('score_label');
+      const chronTitle = document.querySelector('.chronicle-title');
+      if (chronTitle) chronTitle.textContent = ui('chronicle_title');
+      const standTitle = document.querySelector('.standings-title');
+      if (standTitle) standTitle.textContent = ui('standings_title');
+      // Chronicle in EN
+      const ch = document.getElementById('chronicle');
+      if (ch) {
+        ch.innerHTML = '';
+        G.choices.forEach((c, i) => {
+          const entry = document.createElement('div');
+          entry.className = 'chronicle-entry';
+          entry.style.animationDelay = (i * 0.08) + 's';
+          const enText = CHRONICLE_EN[c.text] || c.text;
+          entry.innerHTML = `<span class="chronicle-icon">${c.icon}</span><span>Chapter ${i+1}: ${enText}</span>`;
+          ch.appendChild(entry);
+        });
+      }
+      // Score rank
+      const srEl = document.getElementById('scoreRankText');
+      if (srEl) srEl.textContent = getScoreRankEN(parseInt(document.getElementById('scoreValue').textContent));
+      // Faction names
+      const fNames = {people:'People',army:'Army',nobles:'Nobles',church:'Scholars'};
+      document.querySelectorAll('.standing-name').forEach((el, i) => {
+        el.textContent = Object.values(fNames)[i] || el.textContent;
+      });
+      // Personality summary
+      const pers = PERSONALITIES_EN[G.personality] || PERSONALITIES[G.personality];
+      const pEl = document.getElementById('personalitySummary');
+      if (pEl) pEl.querySelector('.pers-sum-title').textContent = ui('pers_sum_title');
+      if (pEl && pers.name) pEl.querySelector('.pers-sum-name').textContent = pers.name;
+      if (pEl && pers.desc) pEl.querySelector('.pers-sum-desc').textContent = pers.desc;
+      // Replay buttons
+      const replayBtns = document.querySelectorAll('.replay-section .btn-gold');
+      replayBtns.forEach(btn => { if (btn.id !== 'ngBtn') btn.textContent = ui('replay_btn'); });
+      document.querySelectorAll('.replay-section .btn-outline').forEach(btn => btn.textContent = ui('share_btn'));
+      // Years label
+      const yLabel = document.querySelector('.ending-years-label');
+      if (yLabel) yLabel.textContent = ui('years_label');
+      // NG+ button text
+      const ngBtn = document.getElementById('ngBtn');
+      if (ngBtn) ngBtn.innerHTML = ui('ng_btn_text');
+    }, 100);
+    return;
+  }
+  _showEndingOrig_bi(e);
+};
+
+// ── PATCH ACHIEVEMENT ────────────────────────────────────────
+const _checkAchOrig_bi = window.checkAchievement || checkAchievement;
+window.checkAchievement = function(id, icon, name) {
+  if (G.achievements.includes(id)) return;
+  G.achievements.push(id);
+  const def = ACHIEVEMENT_DEFS[id];
+  let displayName;
+  if (currentLang === 'en' && ACHIEVEMENTS_EN[id]) {
+    displayName = ACHIEVEMENTS_EN[id]();
+  } else {
+    displayName = def ? (typeof def.name === 'function' ? def.name() : def.name) : name;
+  }
+  showAchievement(def ? def.icon : icon, displayName);
+  const achTitleEl = document.querySelector('.ach-title');
+  if (achTitleEl) achTitleEl.textContent = ui('ach_title');
+};
+
+// ── PATCH YEAR DISPLAY ───────────────────────────────────────
+const _updateYearOrig_bi = window.updateYearDisplay || updateYearDisplay;
+window.updateYearDisplay = function(sceneId) {
+  _updateYearOrig_bi(sceneId);
+  if (currentLang === 'en') {
+    const yr = CHAPTER_YEARS[sceneId] || G.turn;
+    const el = document.getElementById('yearDisplay');
+    if (el) el.textContent = (YEAR_NAMES_EN[yr] || `Year ${yr}`) + ' of Reign';
+  }
+};
+
+// ── APPLY LANG UI ────────────────────────────────────────────
+// (old applyLangUI/setLang replaced by new versions below)
+
+// ── NEWSPAPER EN ─────────────────────────────────────────────
+const NEWSPAPERS_EN = {
+  debt: {
+    headline: 'A New Ruler on the Throne — And the First Decision Stirs Controversy',
+    sub: 'Palace sources: A bold move to resolve the father\'s debts redraws the map of power',
+  },
+  drought: {
+    headline: 'Arihan Faces the Drought — The Ruler\'s Decision Divides Opinion',
+    sub: 'Between gratitude and discontent: reactions to the decision on the food crisis',
+  },
+  rebellion: {
+    headline: 'The Eastern Rebellion… The Ruler Chooses Their Response',
+    sub: 'Analysts ask: will the ruler\'s decision strengthen the centre or deepen the rift?',
+  },
+  invasion: {
+    headline: 'The Northern Invasion Reveals the Mettle of Rulers',
+    sub: 'Arihan emerged from the trial of war — but the price is still being counted',
+  },
+  plague: {
+    headline: 'The Plague Retreats… But the Question of Who Paid the Price Lingers',
+    sub: 'Death tolls fall, yet the economic and social wounds remain open',
+  },
+  betrayal: {
+    headline: 'The Marwan Affair — The Palace Will Never Be the Same',
+    sub: 'How did the ruler handle the betrayal? A question that will define the nature of this reign forever',
+  },
+  pretender: {
+    headline: 'The Claimant Mystery Is Settled — But the Questions Have Not Ended',
+    sub: 'The ruler\'s decision in the claimant case painted a clear picture: this ruler governs by…',
+  },
+  political_marriage: {
+    headline: 'The Palace Wedding — An Alliance That Redraws the Political Landscape',
+    sub: 'The four factions analyse the consequences: who gains most from this marriage?',
+  },
+};
+
+// ── PATCH NEWSPAPER ──────────────────────────────────────────
+const _origNewspaper = window.showNewspaper;
+window.showNewspaper = function(sceneId, callback) {
+  if (currentLang === 'ar') { _origNewspaper(sceneId, callback); return; }
+
+  const data = NEWSPAPERS_EN[sceneId];
+  if (!data) { _origNewspaper(sceneId, callback); return; }
+
+  const yr = CHAPTER_YEARS[sceneId] || G.currentYear || G.turn;
+  const yearLabel = YEAR_NAMES_EN[yr]
+    ? YEAR_NAMES_EN[yr] + ' of ' + (G.gender === 'female' ? 'Queen ' : 'King ') + G.name + '\'s Reign'
+    : 'Year ' + yr;
+
+  const overlay = document.createElement('div');
+  overlay.className = 'newspaper-overlay';
+  overlay.style.direction = 'ltr';
+  overlay.style.fontFamily = 'Georgia, serif';
+  overlay.innerHTML = `
+    <div class="newspaper-inner">
+      <div class="newspaper-masthead">
+        <div class="newspaper-name" style="font-family:'Georgia',serif;letter-spacing:4px">THE ARIHAN HERALD</div>
+        <div class="newspaper-date">${yearLabel}</div>
+      </div>
+      <div class="newspaper-body">
+        <div class="newspaper-headline" style="font-family:'Georgia',serif">${data.headline}</div>
+        <div class="newspaper-sub">${data.sub}</div>
+        <div class="newspaper-byline">The Independent Press of Arihan — Since the Kingdom's Founding</div>
+      </div>
+      <button class="newspaper-btn" id="npClose" style="font-family:'Georgia',serif;letter-spacing:2px">Continue Reading →</button>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  overlay.querySelector('#npClose').onclick = () => {
+    overlay.style.opacity = '0';
+    overlay.style.transition = 'opacity 0.3s';
+    setTimeout(() => { overlay.remove(); callback(); }, 300);
+  };
+};
+
+// ── NG+ SCENES EN ────────────────────────────────────────────
+const NG_PLUS_SCENES_EN = {
+  ng_spy: {
+    chapter: '✦ New Game+ — What You Did Not Know the First Time',
+    title: "Your Dead Father's Secret",
+    memory: () => '🕯️ NG+ — Nasr carries your father\'s secrets',
+    text: () => `
+      On the first night you sleep as ${gT('a King','a Queen')}, an old man enters — one you have never seen before.
+      He introduces himself: <span class="char-name">Nasr</span> — your father's personal keeper of secrets for thirty years.
+      <br><br>
+      <span class="whisper">"Your Majesty, your late father entrusted me with one thing: if he died before he could tell you — I am the one who tells you."</span>
+      <br><br>
+      He then places three things before you: <span class="dramatic">a letter sealed with Marwan's seal</span>, a map to a secret chamber in the palace, and one sentence: <span class="whisper">"Your father did not die of natural illness."</span>
+      <br><br>
+      Nasr waits. His eyes do not lie — but they conceal much as well.
+    `,
+    choices_text: [
+      'Open the letter and enter the secret chamber — the full truth or nothing',
+      'Expel Nasr — one who brings news of the dead in the night cannot be trusted',
+      'Listen to everything but act not yet — time is a weapon',
+    ],
+    sub: [
+      [{ label:'+Scholars +8', type:'up' }, { label:'−Army −5 (suspicion spreads)', type:'down' }, { label:"Reveals Marwan's secret early", type:'neutral' }],
+      [{ label:'+Army +8 (resolve)', type:'up' }, { label:'You remain in the dark', type:'neutral' }],
+      [{ label:'+Scholars +5', type:'up' }, { label:'+People +3', type:'up' }, { label:'A card held in reserve', type:'neutral' }],
+    ],
+  },
+  ng_leyla: {
+    chapter: '✦ New Game+ — The Other Face',
+    title: 'Leyla — Who Is She Really?',
+    memory: () => G.tags.has('ng_knows_murder') ? '🌙 NG+ — Leyla is Nasr\'s daughter' : '🌙 NG+ — Leyla knows your father\'s secret',
+    text: () => {
+      const knowsMurder = G.tags.has('ng_knows_murder');
+      const base = `
+        Leyla requests a private audience — no guards, no witnesses.
+        She sits before you and places on the table something you did not expect:
+        <span class="dramatic">a ring bearing your father's family crest… believed lost for twenty years.</span>
+        <br><br>
+        <span class="whisper">"Your Majesty, I am not merely an advisor. My mother was your father's closest handmaiden. And my father…"</span>
+        She pauses. Her eyes search your face for something.
+        <span class="whisper">"My father is Nasr."</span>
+        <br><br>
+      `;
+      if (knowsMurder) {
+        return base + `<span class="good-word">The picture completes itself</span> — Leyla knows her father told you. She came to finish what he began.`;
+      }
+      return base + `She looks at you with calm eyes: <span class="whisper">"I know what you do not know about your father's death. The question is: do you wish to know?"</span>`;
+    },
+    choices_text: [
+      'Hear her fully — this meeting was no coincidence',
+      "Request an official document — words alone are not enough in a palace",
+      'Rise and leave — the palace has enough secrets',
+    ],
+    sub: [
+      [{ label:'+Scholars +10', type:'up' }, { label:'+People +5', type:'up' }, { label:"Opens Leyla's full storyline", type:'neutral' }],
+      [{ label:'+Nobles +5', type:'up' }, { label:'Leyla respects your resolve', type:'neutral' }],
+      [{ label:'+Army +8 (resolve)', type:'up' }, { label:'Leyla disappears from the story', type:'down' }],
+    ],
+  },
+};
+
+// ── PATCH SHOWSCENE for NG+ EN ────────────────────────────────
+const _showSceneOrig_ng = window.showScene;
+window.showScene = function(sc) {
+  if (currentLang === 'en') {
+    const ngKey = Object.keys(NG_PLUS_SCENES).find(k => NG_PLUS_SCENES[k] === sc);
+    if (ngKey && NG_PLUS_SCENES_EN[ngKey]) {
+      const enNg = NG_PLUS_SCENES_EN[ngKey];
+      const patchedSc = Object.assign({}, sc, {
+        chapter: enNg.chapter,
+        title: enNg.title,
+        text: enNg.text,
+        memory: enNg.memory,
+        choices: sc.choices.map((c, i) => Object.assign({}, c, {
+          text: enNg.choices_text[i] || c.text,
+          sub: enNg.sub[i] || c.sub,
+        })),
+      });
+      // Use the earlier showScene which handles EN localization
+      _showSceneOrig_ng(patchedSc);
+      setTimeout(() => {
+        const body = document.getElementById('sceneBody');
+        if (body) body.innerHTML = localizeNames(body.innerHTML);
+      }, 50);
+      return;
+    }
+  }
+  _showSceneOrig_ng(sc);
+};
+
+// ── CHRONICLE: add missing entries ───────────────────────────
+Object.assign(CHRONICLE_EN, {
+  '[NG+] اكتشف سر مقتل أبيه من نصر الكاتم': '[NG+] Uncovered the secret of his father\'s death from Nasr',
+  '[NG+] طرد نصر الكاتم ورفض معرفة الحقيقة': '[NG+] Expelled Nasr and refused to learn the truth',
+  '[NG+] استمع لنصر وانتظر الوقت المناسب':  '[NG+] Listened to Nasr and waited for the right moment',
+  '[NG+] عرف حقيقة ليلى وفتح معها تحالفاً عميقاً': '[NG+] Learned Leyla\'s truth and forged a deep alliance with her',
+  '[NG+] طلب من ليلى وثيقة رسمية قبل التصديق':   '[NG+] Requested official documentation from Leyla before trusting her',
+  '[NG+] رفض الاستماع لليلى وأغلق الباب':         '[NG+] Refused to hear Leyla and closed the door',
+  '[NG+] تعامل مع الجاسوس بحنكة':                 '[NG+] Handled the spy with cunning',
+  '[NG+] أحال الجاسوس للمحاكمة العلنية':          '[NG+] Sent the spy to public trial',
+});
+
+// ── FULL applyLangUI OVERRIDE (replaces earlier version) ─────
+function applyLangUI() {
+  const isFemale = (G && G.gender === 'female') || selectedGender === 'female';
+  const isEN = currentLang === 'en';
+
+  // Direction & font
+  document.documentElement.setAttribute('dir', isEN ? 'ltr' : 'rtl');
+  document.documentElement.setAttribute('lang', currentLang);
+  document.body.style.fontFamily = isEN ? "'Georgia', serif" : '';
+
+  // ── Splash ───────────────────────────────────────
+  const splashTitle = document.querySelector('.splash-title');
+  if (splashTitle) splashTitle.textContent = 'أريهان';
+  const splashSub = document.querySelector('.splash-sub');
+  if (splashSub) splashSub.textContent = isEN ? 'Kingdom of Decision & Destiny' : 'مملكة القرار والمصير';
+  const splashHint = document.querySelector('.splash-hint');
+  if (splashHint) splashHint.textContent = isEN ? 'The kingdom awaits you…' : 'المملكة تنتظرك...';
+
+  // ── Intro lore ───────────────────────────────────
+  const introLore = document.querySelector('.intro-lore');
+  if (introLore) introLore.innerHTML = isEN
+    ? `The kingdom of <em>Arihan</em> bleeds from within.
+       The late king left behind heavy debts,
+       scattered factions, and a throne shaken by fear.
+       <br><br>
+       You are the sole heir — and the pen is in your hand.
+       Every decision will be told in the chronicles of history
+       or buried forever.`
+    : `مملكة <em>أريهان</em> تنزف من الداخل.
+       الملك الراحل ترك وراءه ديوناً ثقيلة،
+       فصائل متناثرة، وعرشاً يهزّه الخوف.
+       <br><br>
+       أنت الوريث الوحيد — والقلم بيدك.
+       كل قرار سيُحكى في سجلات التاريخ
+       أو يُطمس إلى الأبد.`;
+
+  // ── Personality section ──────────────────────────
+  const persLabel = document.querySelector('.personality-section .section-label');
+  if (persLabel) persLabel.textContent = isEN ? '✦ Your Ruling Nature ✦' : '✦ طبيعة حكمك ✦';
+  const persData = [
+    { ar: 'الحكيم',       en: 'The Sage',      bonusAr: '+حكماء بداية', bonusEn: '+Scholars start' },
+    { ar: 'المحارب',      en: 'The Warrior',   bonusAr: '+جيش بداية',   bonusEn: '+Army start' },
+    { ar: 'الدبلوماسي',   en: 'The Diplomat',  bonusAr: '+شعب بداية',   bonusEn: '+People start' },
+  ];
+  document.querySelectorAll('.pers-card').forEach((card, i) => {
+    const d = persData[i];
+    if (!d) return;
+    const nameEl = card.querySelector('.pers-name');
+    const bonusEl = card.querySelector('.pers-bonus');
+    if (nameEl) nameEl.textContent = isEN ? d.en : d.ar;
+    if (bonusEl) bonusEl.textContent = isEN ? d.bonusEn : d.bonusAr;
+  });
+
+  // ── Faction preview cards ────────────────────────
+  const factionData = [
+    { nameAr:'الشعب',   nameEn:'People',   descAr:'قوتك الحقيقية',   descEn:'Your true power' },
+    { nameAr:'الجيش',   nameEn:'Army',     descAr:'حراس العرش',      descEn:'Guardians of the throne' },
+    { nameAr:'النبلاء', nameEn:'Nobles',   descAr:'أصحاب الثروة',    descEn:'Owners of wealth' },
+    { nameAr:'الحكماء', nameEn:'Scholars', descAr:'مشورة ورأي',      descEn:'Counsel & wisdom' },
+  ];
+  document.querySelectorAll('.factions-preview .faction-card').forEach((card, i) => {
+    const d = factionData[i];
+    if (!d) return;
+    const nameEl = card.querySelector('.faction-card-name');
+    const descEl = card.querySelector('.faction-card-desc');
+    if (nameEl) nameEl.textContent = isEN ? d.nameEn : d.nameAr;
+    if (descEl) descEl.textContent = isEN ? d.descEn : d.descAr;
+  });
+
+  // ── Faction stat bar labels ──────────────────────
+  const statLabels = [
+    { ar:'🏘️ الشعب', en:'🏘️ People' },
+    { ar:'🗡️ الجيش', en:'🗡️ Army' },
+    { ar:'💎 النبلاء', en:'💎 Nobles' },
+    { ar:'📜 الحكماء', en:'📜 Scholars' },
+  ];
+  document.querySelectorAll('.faction-stat-name').forEach((el, i) => {
+    if (statLabels[i]) el.textContent = isEN ? statLabels[i].en : statLabels[i].ar;
+  });
+
+  // ── Gender section ───────────────────────────────
+  const genderLabel = document.querySelector('.gender-section .section-label');
+  if (genderLabel) genderLabel.textContent = isEN ? '✦ Who Are You? ✦' : '✦ من تكون؟ ✦';
+  const genderCards = document.querySelectorAll('.gender-card');
+  if (genderCards.length >= 2) {
+    const gn0 = genderCards[0].querySelector('.gender-name');
+    const gn1 = genderCards[1].querySelector('.gender-name');
+    if (gn0) gn0.textContent = isEN ? 'King' : 'ملك';
+    if (gn1) gn1.textContent = isEN ? 'Queen' : 'ملكة';
+  }
+
+  // ── Name label & placeholder ─────────────────────
+  const nameLabel = document.getElementById('nameLabelText');
+  if (nameLabel) nameLabel.textContent = isEN
+    ? (isFemale ? '✦ What is your name, O Queen? ✦' : '✦ What is your name, O King? ✦')
+    : (isFemale ? '✦ ما اسمكِ أيتها الملكة؟ ✦'       : '✦ ما اسمك أيها الملك؟ ✦');
+  const kingInput = document.getElementById('kingInput');
+  if (kingInput) kingInput.placeholder = isEN ? 'Enter your name…' : (isFemale ? 'اكتبي اسمكِ...' : 'اكتب اسمك...');
+
+  // ── Start button ─────────────────────────────────
+  const startBtn = document.getElementById('startBtn');
+  if (startBtn) startBtn.textContent = isEN ? '⚔️ Claim the Throne ⚔️' : (isFemale ? '⚔️ تسلّمي العرش ⚔️' : '⚔️ تسلّم العرش ⚔️');
+
+  // ── Map ──────────────────────────────────────────
+  const mapTitle = document.querySelector('.map-title');
+  if (mapTitle) mapTitle.textContent = isEN ? '🗺️ Map of the Kingdom of Arihan' : '🗺️ خريطة مملكة أريهان';
+  const mapClose = document.querySelector('.map-close');
+  if (mapClose) mapClose.textContent = isEN ? '✕ Close Map' : '✕ أغلق الخريطة';
+  const mapBtn = document.querySelector('.map-btn');
+  if (mapBtn) mapBtn.textContent = isEN ? '🗺️ Map' : '🗺️ الخريطة';
+
+  // Map SVG labels
+  const mapSVGTexts = document.querySelectorAll('.map-svg text');
+  if (mapSVGTexts.length) {
+    const mapLabels = {
+      'الثندار الشمالية': 'Northern Thandar',
+      'العاصمة':          'Capital',
+      'الشرق':            'East',
+      'الجبال':           'Mountains',
+      'الصحراء الجنوبية': 'Southern Desert',
+      'نهر أريهان':       'Arihan River',
+      'ش': 'N', 'ج': 'S', 'غ': 'W',
+    };
+    mapSVGTexts.forEach(el => {
+      const orig = el.textContent.trim();
+      if (isEN && mapLabels[orig]) el.textContent = mapLabels[orig];
+      else if (!isEN && mapLabels[orig]) {
+        // revert handled by re-loading; skip for now
+      }
+    });
+  }
+
+  // Compass E (شرق at index 3 = 'ش' duplicate — skip double-ش)
+  const compassTexts = document.querySelectorAll('.map-svg g text');
+  if (compassTexts.length >= 4 && isEN) {
+    const dirs = ['N','S','W','E'];
+    compassTexts.forEach((el, i) => { if (dirs[i]) el.textContent = dirs[i]; });
+  } else if (!isEN) {
+    const dirs = ['ش','ج','غ','ش'];
+    compassTexts.forEach((el, i) => { if (dirs[i]) el.textContent = dirs[i]; });
+  }
+
+  // ── In-game bar ──────────────────────────────────
+  const yearDisplay = document.getElementById('yearDisplay');
+  if (yearDisplay && G && G.currentYear) {
+    const yr = G.currentYear;
+    yearDisplay.textContent = isEN
+      ? (YEAR_NAMES_EN[yr] || 'Year ' + yr) + ' of Reign'
+      : (YEAR_NAMES[yr] || 'السنة ' + yr) + ' من الحكم';
+  }
+  const chapterIndicator = document.getElementById('chapterIndicator');
+  if (chapterIndicator && G && G.turn) {
+    chapterIndicator.textContent = isEN ? 'Chapter ' + G.turn : 'الفصل ' + arabNum(G.turn);
+  }
+  const choicesHeader = document.getElementById('choicesHeader');
+  if (choicesHeader) choicesHeader.textContent = isEN
+    ? (isFemale ? '— Choose your path, O Queen —' : '— Choose your path, O King —')
+    : (isFemale ? '— اختاري مسارك أيتها الملكة —' : '— اختر مسارك أيها الملك —');
+
+  // ── King title bar ───────────────────────────────
+  const kingTitleBar = document.getElementById('kingTitleBar');
+  if (kingTitleBar && G && G.name) {
+    const pers = PERSONALITIES[G.personality];
+    const persName = isEN ? (PERSONALITIES_EN[G.personality]?.name || pers.name) : pers.name;
+    const titleWord = isEN ? (isFemale ? 'Queen' : 'King') : (isFemale ? 'الملكة' : 'الملك');
+    kingTitleBar.innerHTML = `${titleWord} ${G.name} <span class="personality-badge">${pers.icon} ${persName}</span>`;
+  }
+
+  // ── Persistent UI elements ───────────────────────
+  const saveInd = document.getElementById('saveIndicator');
+  if (saveInd) saveInd.textContent = isEN ? '💾 Auto-saved' : '💾 تم الحفظ تلقائياً';
+  const achTitle = document.querySelector('.ach-title');
+  if (achTitle) achTitle.textContent = isEN ? 'New Achievement' : 'إنجاز جديد';
+
+  // ── NG+ badge ────────────────────────────────────
+  const ngBadge = document.getElementById('ngBadge');
+  if (ngBadge) ngBadge.textContent = isEN
+    ? '✦ Hard Governance Mode — New Game+ ✦'
+    : '✦ وضع الحكم الصعب — New Game+ ✦';
+
+  // ── Lang toggle button states ────────────────────
+  const btnAr = document.getElementById('btnAr');
+  const btnEn = document.getElementById('btnEn');
+  if (btnAr) { btnAr.style.color = isEN ? '#a08860' : '#d4a843'; btnAr.style.background = isEN ? 'transparent' : 'rgba(212,168,67,0.15)'; }
+  if (btnEn) { btnEn.style.color = isEN ? '#d4a843' : '#a08860'; btnEn.style.background = isEN ? 'rgba(212,168,67,0.15)' : 'transparent'; }
+}
+
+// ── CHOOSE LANG (from the opening screen) ────────────────────
+function chooseLang(lang) {
+  currentLang = lang;
+  try { localStorage.setItem('arihan_lang', lang); } catch(e){}
+  const screen = document.getElementById('langSelect');
+  if (screen) {
+    screen.classList.add('hidden');
+    setTimeout(() => screen.remove(), 800);
+  }
+  // Apply immediately
+  setLang(lang);
+}
+
+// ── SET LANGUAGE ─────────────────────────────────────────────
+function setLang(lang) {
+  currentLang = lang;
+  try { localStorage.setItem('arihan_lang', lang); } catch(e){}
+  applyLangUI();
+}
+
+// ── PATCH SELECTGENDER ───────────────────────────────────────
+window.selectGender = function(el) {
+  document.querySelectorAll('.gender-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedGender = el.dataset.gender;
+  const isFemale = selectedGender === 'female';
+  const isEN = currentLang === 'en';
+  const nameLabel = document.getElementById('nameLabelText');
+  if (nameLabel) nameLabel.textContent = isEN
+    ? (isFemale ? '✦ What is your name, O Queen? ✦' : '✦ What is your name, O King? ✦')
+    : (isFemale ? '✦ ما اسمكِ أيتها الملكة؟ ✦'       : '✦ ما اسمك أيها الملك؟ ✦');
+  const kingInput = document.getElementById('kingInput');
+  if (kingInput) kingInput.placeholder = isEN ? 'Enter your name…' : (isFemale ? 'اكتبي اسمكِ...' : 'اكتب اسمك...');
+  const startBtn = document.getElementById('startBtn');
+  if (startBtn) startBtn.textContent = isEN ? '⚔️ Claim the Throne ⚔️' : (isFemale ? '⚔️ تسلّمي العرش ⚔️' : '⚔️ تسلّم العرش ⚔️');
+  const choicesHeader = document.getElementById('choicesHeader');
+  if (choicesHeader) choicesHeader.textContent = isEN
+    ? (isFemale ? '— Choose your path, O Queen —' : '— Choose your path, O King —')
+    : (isFemale ? '— اختاري مسارك أيتها الملكة —' : '— اختر مسارك أيها الملك —');
+};
+
+// ── PATCH RESTART ────────────────────────────────────────────
+const _origRestart_bi = window.restartGame;
+window.restartGame = function() {
+  _origRestart_bi();
+  setTimeout(() => applyLangUI(), 100);
+};
+
+// ── PATCH STARTGAME ──────────────────────────────────────────
+const _origStart_bi = window.startGame;
+window.startGame = function() {
+  _origStart_bi();
+  setTimeout(() => applyLangUI(), 150);
+};
+
+// ── PATCH SHARE ──────────────────────────────────────────────
+const _origShare_bi = window.shareResult || shareResult;
+window.shareResult = function() {
+  if (currentLang === 'ar') { _origShare_bi(); return; }
+  const score = document.getElementById('scoreValue').textContent;
+  const pers = PERSONALITIES_EN[G.personality] || PERSONALITIES[G.personality];
+  const ending = document.getElementById('endingTitle').textContent;
+  const isFemale = G.gender === 'female';
+  const text = `👑 I played Arihan!\n\n${isFemale ? 'Queen' : 'King'}: ${G.name} (${PERSONALITIES[G.personality].icon} ${pers.name})\nEnding: "${ending}"\nGovernance Score: ${score}\n\nPeople: ${G.people} | Army: ${G.army} | Nobles: ${G.nobles} | Scholars: ${G.church}\n\nArihan — Kingdom of Decision & Destiny`;
+  if (navigator.share) {
+    navigator.share({ title: 'Arihan', text });
+  } else {
+    navigator.clipboard?.writeText(text).then(() => showBanner('📋', 'Result copied!'));
+  }
+};
+
+// ── INIT ─────────────────────────────────────────────────────
+// If lang was previously saved, skip the selection screen
+(function initLang() {
+  let saved = null;
+  try { saved = localStorage.getItem('arihan_lang'); } catch(e){}
+  if (saved) {
+    // Skip lang select screen
+    const screen = document.getElementById('langSelect');
+    if (screen) { screen.style.display = 'none'; screen.remove(); }
+    currentLang = saved;
+    setTimeout(() => setLang(saved), 200);
+  } else {
+    // Show lang select — it's already in the DOM
+    // applyLangUI will be called when user picks
+    setTimeout(() => {
+      // Default: show both equally until chosen
+    }, 100);
+  }
+}());
+
 
 </script>
 </body>
